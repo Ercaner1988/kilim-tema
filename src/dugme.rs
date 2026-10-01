@@ -119,10 +119,10 @@ pub fn kutu(ui: &mut Ui, acik: &mut bool, metin: impl Into<WidgetText>) -> Respo
     cevap
 }
 
-/// Anahtar (toggle) çizimi: `iz` renkli kanal, düğmesi boncuk. `konum` 0 = kapalı, 1 = açık
+/// Anahtar (toggle) çizimi: kanal `iz` tonlu kâğıt (bkz. [`crate::kagit_ciz`]), düğmesi boncuk. `konum` 0 = kapalı, 1 = açık
 /// (`ctx.animate_bool` ile kaydırılabilir). Kapalıyken boncuk solgun.
 pub fn anahtar_ciz(painter: &Painter, rect: Rect, konum: f32, iz: Color32) {
-    painter.rect_filled(rect, CornerRadius::same(255), iz);
+    crate::kagit_ciz_yuvarlak(painter, rect, iz, CornerRadius::same(255));
     let cap = rect.height() - 2.0;
     let x = egui::lerp(
         rect.left() + 1.0 + cap * 0.5..=rect.right() - 1.0 - cap * 0.5,

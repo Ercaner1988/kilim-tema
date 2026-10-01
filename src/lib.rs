@@ -97,6 +97,11 @@ impl Boncuk {
 /// Kâğıt zemini (döşenmiş lif + gerilmiş leke) `rect`'e çizer. `ton` çarpılır:
 /// açık temada `WHITE`, koyuda [`KOYU_KAGIT`] (doku kalır, zemin koyulaşır).
 pub fn kagit_ciz(painter: &Painter, rect: Rect, ton: Color32) {
+    kagit_ciz_yuvarlak(painter, rect, ton, egui::CornerRadius::ZERO);
+}
+
+/// [`kagit_ciz`], köşeleri `kose` ile yuvarlatılmış (kutu, anahtar kanalı).
+pub fn kagit_ciz_yuvarlak(painter: &Painter, rect: Rect, ton: Color32, kose: egui::CornerRadius) {
     let d = dokular(painter.ctx());
     let karo = d.kagit.size_vec2() * KAGIT_OLCEK;
     // UV ekran konumundan: karo pencerenin sol üstüne sabit, panel/rect değişse de kaymaz.
@@ -104,7 +109,10 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect, ton: Color32) {
         (rect.min.to_vec2() / karo).to_pos2(),
         (rect.max.to_vec2() / karo).to_pos2(),
     );
-    painter.image(d.kagit.id(), rect, uv, ton);
+    let katman = |doku, uv| {
+        Shape::Rect(egui::epaint::RectShape::filled(rect, kose, ton).with_texture(doku, uv))
+    };
+    painter.add(katman(d.kagit.id(), uv));
     // Leke bütün pencereye gerilir; küçük kutu (sekme, metin kutusu) kendi payını alır,
     // yoksa lekenin koyu kenarları her kutunun ucunda şerit olur.
     let pencere = painter.ctx().content_rect();
@@ -112,7 +120,7 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect, ton: Color32) {
         ((rect.min - pencere.min) / pencere.size()).to_pos2(),
         ((rect.max - pencere.min) / pencere.size()).to_pos2(),
     );
-    painter.image(d.leke.id(), rect, pay, ton);
+    painter.add(katman(d.leke.id(), pay));
 }
 
 fn dortgen(m: &mut Mesh, p: [Pos2; 4], uv: [Pos2; 4]) {
