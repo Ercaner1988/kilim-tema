@@ -160,7 +160,12 @@ pub fn kenarlik_ciz(painter: &Painter, rect: Rect, varyant: Varyant, t: f32) {
 /// kenarlığın içinde, saydam panel zeminiyle çizilir.
 pub fn cerceve<R>(ui: &mut Ui, varyant: Varyant, icerik: impl FnOnce(&mut Ui) -> R) -> R {
     let rect = ui.max_rect();
-    kagit_ciz(ui.painter(), rect);
+    if ui.visuals().dark_mode {
+        // ponytail: koyu kâğıt dokusu yok (istem §9.3 açık); açık kâğıt üstünde açık metin okunmaz.
+        ui.painter().rect_filled(rect, 0.0, koyu().zem);
+    } else {
+        kagit_ciz(ui.painter(), rect);
+    }
     kenarlik_ciz(ui.painter(), rect, varyant, KALINLIK);
     ui.scope_builder(UiBuilder::new().max_rect(rect.shrink(KALINLIK)), |ui| {
         ui.visuals_mut().panel_fill = Color32::TRANSPARENT;
