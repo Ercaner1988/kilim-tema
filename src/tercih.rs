@@ -93,6 +93,7 @@ impl TemaTercihi {
             Aydinlik::Acik => ThemePreference::Light,
             Aydinlik::Koyu => ThemePreference::Dark,
         });
+        crate::varyanti_kaydet(ctx, self.varyant);
     }
 }
 

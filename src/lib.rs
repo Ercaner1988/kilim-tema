@@ -37,6 +37,37 @@ pub enum Varyant {
     KirmiziYesil,
 }
 
+impl Varyant {
+    /// Seçim/vurgu rengi kenarlıktan: cam göbeği → firuze, kırmızı-yeşil → kök boya.
+    /// Açıkta üstüne açık yazı, koyuda koyu yazı gelir (ikisi de WCAG AA, sınamada).
+    pub fn vurgu(self, koyu_mu: bool) -> Color32 {
+        match (self, koyu_mu) {
+            (Varyant::CamGobegiAltin, false) => Color32::from_rgb(0x0E, 0x7C, 0x86),
+            (Varyant::CamGobegiAltin, true) => Color32::from_rgb(0x5C, 0xC3, 0xC9),
+            (Varyant::KirmiziYesil, false) => Color32::from_rgb(0xA8, 0x32, 0x2B),
+            (Varyant::KirmiziYesil, true) => Color32::from_rgb(0xE0, 0x7A, 0x6E),
+        }
+    }
+}
+
+const VARYANT_ID: &str = "kilim-tema-varyant";
+
+/// `TemaTercihi::uygula`nın son kurduğu kenarlık varyantı (hiç kurulmadıysa cam göbeği).
+pub fn etkin_varyant(ctx: &egui::Context) -> Varyant {
+    ctx.data(|d| d.get_temp(egui::Id::new(VARYANT_ID)))
+        .unwrap_or(Varyant::CamGobegiAltin)
+}
+
+pub(crate) fn varyanti_kaydet(ctx: &egui::Context, v: Varyant) {
+    ctx.data_mut(|d| d.insert_temp(egui::Id::new(VARYANT_ID), v));
+    for (tema, koyu_mu) in [(egui::Theme::Light, false), (egui::Theme::Dark, true)] {
+        ctx.style_mut_of(tema, |s| {
+            s.visuals.selection.bg_fill = v.vurgu(koyu_mu).gamma_multiply(0.45);
+            s.visuals.widgets.hovered.bg_stroke.color = v.vurgu(koyu_mu);
+        });
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Boncuk {
     Firuze,
@@ -230,5 +261,35 @@ mod sinama {
         assert_eq!(tekrar(700.0, 70.5), 10.0);
         assert_eq!(tekrar(740.0, 70.5), 10.0); // 10.5 → en yakın tam sayı, birim hafif esner
         assert_eq!(tekrar(20.0, 70.5), 1.0); // çok dar pencerede bile en az bir birim
+    }
+}
+
+#[cfg(test)]
+mod vurgu_sinama {
+    use super::*;
+
+    fn parlaklik(c: Color32) -> f32 {
+        let d = |v: u8| {
+            let v = f32::from(v) / 255.0;
+            if v <= 0.03928 {
+                v / 12.92
+            } else {
+                ((v + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * d(c.r()) + 0.7152 * d(c.g()) + 0.0722 * d(c.b())
+    }
+
+    fn karsitlik(a: Color32, b: Color32) -> f32 {
+        let (x, y) = (parlaklik(a), parlaklik(b));
+        (x.max(y) + 0.05) / (x.min(y) + 0.05)
+    }
+
+    #[test]
+    fn vurgu_ustundeki_yazi_okunur() {
+        for v in [Varyant::CamGobegiAltin, Varyant::KirmiziYesil] {
+            assert!(karsitlik(v.vurgu(false), acik().yuzey) >= 4.5, "{v:?} açık");
+            assert!(karsitlik(v.vurgu(true), koyu().zem) >= 4.5, "{v:?} koyu");
+        }
     }
 }
