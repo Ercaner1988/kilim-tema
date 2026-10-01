@@ -112,23 +112,27 @@ fn dosya(uygulama: &str) -> Option<PathBuf> {
 /// "Tema" menüsü. Değişiklik olursa `uygula` çağrılmış olarak `true` döner (kaydetmek çağırana kalır).
 pub fn tema_secici(ui: &mut Ui, tercih: &mut TemaTercihi) -> bool {
     let once = *tercih;
-    ui.menu_button("Tema", |ui| {
+    let dugme = crate::boncuklu(ui, crate::Boncuk::Kehribar, "Tema");
+    egui::containers::menu::MenuButton::from_button(dugme).ui(ui, |ui| {
         ui.label("Görünüm");
-        ui.radio_value(
+        crate::secim(
+            ui,
             &mut tercih.gorunum,
             Gorunum::Kilim,
             "Kilim (kâğıt + kenarlık)",
         );
-        ui.radio_value(&mut tercih.gorunum, Gorunum::Sade, "Sade (dokusuz)");
+        crate::secim(ui, &mut tercih.gorunum, Gorunum::Sade, "Sade (dokusuz)");
         ui.separator();
         ui.add_enabled_ui(tercih.gorunum == Gorunum::Kilim, |ui| {
             ui.label("Kenarlık");
-            ui.radio_value(
+            crate::secim(
+                ui,
                 &mut tercih.varyant,
                 Varyant::CamGobegiAltin,
                 "Cam göbeği + altın",
             );
-            ui.radio_value(
+            crate::secim(
+                ui,
                 &mut tercih.varyant,
                 Varyant::KirmiziYesil,
                 "Kırmızı + yeşil",
@@ -136,9 +140,9 @@ pub fn tema_secici(ui: &mut Ui, tercih: &mut TemaTercihi) -> bool {
         });
         ui.separator();
         ui.label("Aydınlık");
-        ui.radio_value(&mut tercih.aydinlik, Aydinlik::Sistem, "Sistemi izle");
-        ui.radio_value(&mut tercih.aydinlik, Aydinlik::Acik, "Açık");
-        ui.radio_value(&mut tercih.aydinlik, Aydinlik::Koyu, "Koyu");
+        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Sistem, "Sistemi izle");
+        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Acik, "Açık");
+        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Koyu, "Koyu");
     });
     let degisti = *tercih != once;
     if degisti {

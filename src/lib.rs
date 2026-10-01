@@ -8,10 +8,12 @@
 //! - boncuk düğme **sabit boyutlu**, durumlar ton/ölçekle kodda türetilir.
 
 mod doku;
+mod dugme;
 mod renk;
 mod tercih;
 
 pub use doku::{dokular, Dokular, Kenarlik};
+pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
 pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
 pub use tercih::{tema_secici, Aydinlik, Gorunum, TemaTercihi};
 
@@ -24,7 +26,9 @@ use egui::{
 pub const KALINLIK: f32 = 32.0;
 /// Kâğıt karosu 1 doku pikseli = 0.5 mantıksal px (2x ekranda birebir).
 const KAGIT_OLCEK: f32 = 0.5;
-const UV_TAM: Rect = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
+/// Koyu temada kâğıda çarpılan ton: sonuç ≈ `koyu().zem`, kartlar (`yuzey`) bir tık açık kalır.
+pub const KOYU_KAGIT: Color32 = Color32::from_rgb(40, 35, 29);
+pub(crate) const UV_TAM: Rect = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Varyant {
@@ -58,8 +62,9 @@ impl Boncuk {
     }
 }
 
-/// Kâğıt zemini (döşenmiş lif + gerilmiş leke) `rect`'e çizer.
-pub fn kagit_ciz(painter: &Painter, rect: Rect) {
+/// Kâğıt zemini (döşenmiş lif + gerilmiş leke) `rect`'e çizer. `ton` çarpılır:
+/// açık temada `WHITE`, koyuda [`KOYU_KAGIT`] (doku kalır, zemin koyulaşır).
+pub fn kagit_ciz(painter: &Painter, rect: Rect, ton: Color32) {
     let d = dokular(painter.ctx());
     let karo = d.kagit.size_vec2() * KAGIT_OLCEK;
     // UV ekran konumundan: karo pencerenin sol üstüne sabit, panel/rect değişse de kaymaz.
@@ -67,8 +72,8 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect) {
         (rect.min.to_vec2() / karo).to_pos2(),
         (rect.max.to_vec2() / karo).to_pos2(),
     );
-    painter.image(d.kagit.id(), rect, uv, Color32::WHITE);
-    painter.image(d.leke.id(), rect, UV_TAM, Color32::WHITE);
+    painter.image(d.kagit.id(), rect, uv, ton);
+    painter.image(d.leke.id(), rect, UV_TAM, ton);
 }
 
 fn dortgen(m: &mut Mesh, p: [Pos2; 4], uv: [Pos2; 4]) {
@@ -167,12 +172,13 @@ pub fn cerceve<R>(ui: &mut Ui, tercih: &TemaTercihi, icerik: impl FnOnce(&mut Ui
         return icerik(ui);
     }
     let varyant = tercih.varyant;
-    if ui.visuals().dark_mode {
-        // ponytail: koyu kâğıt dokusu yok (istem §9.3 açık); açık kâğıt üstünde açık metin okunmaz.
-        ui.painter().rect_filled(rect, 0.0, koyu().zem);
+    // Koyuda aynı kâğıt koyulaştırılır: açık kâğıt üstünde açık metin okunmaz.
+    let ton = if ui.visuals().dark_mode {
+        KOYU_KAGIT
     } else {
-        kagit_ciz(ui.painter(), rect);
-    }
+        Color32::WHITE
+    };
+    kagit_ciz(ui.painter(), rect, ton);
     kenarlik_ciz(ui.painter(), rect, varyant, KALINLIK);
     ui.scope_builder(UiBuilder::new().max_rect(rect.shrink(KALINLIK)), |ui| {
         ui.visuals_mut().panel_fill = Color32::TRANSPARENT;
