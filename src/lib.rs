@@ -9,9 +9,11 @@
 
 mod doku;
 mod renk;
+mod tercih;
 
 pub use doku::{dokular, Dokular, Kenarlik};
-pub use renk::{acik, gecis_uygula, koyu, Kilim};
+pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
+pub use tercih::{tema_secici, Aydinlik, Gorunum, TemaTercihi};
 
 use egui::epaint::{Mesh, Vertex};
 use egui::{
@@ -156,10 +158,15 @@ pub fn kenarlik_ciz(painter: &Painter, rect: Rect, varyant: Varyant, t: f32) {
     }
 }
 
-/// Uygulamanın kök `Ui`'sini kâğıt + kilim çerçeveyle sarar; içerik (paneller dahil)
-/// kenarlığın içinde, saydam panel zeminiyle çizilir.
-pub fn cerceve<R>(ui: &mut Ui, varyant: Varyant, icerik: impl FnOnce(&mut Ui) -> R) -> R {
+/// Uygulamanın kök `Ui`'sini tercihe göre sarar. Kilim: kâğıt + kenarlık, içerik (paneller
+/// dahil) kenarlığın içinde saydam panel zeminiyle. Sade: yalnız uygulamanın düz zemini.
+pub fn cerceve<R>(ui: &mut Ui, tercih: &TemaTercihi, icerik: impl FnOnce(&mut Ui) -> R) -> R {
     let rect = ui.max_rect();
+    if tercih.gorunum == Gorunum::Sade {
+        ui.painter().rect_filled(rect, 0.0, ui.visuals().panel_fill);
+        return icerik(ui);
+    }
+    let varyant = tercih.varyant;
     if ui.visuals().dark_mode {
         // ponytail: koyu kâğıt dokusu yok (istem §9.3 açık); açık kâğıt üstünde açık metin okunmaz.
         ui.painter().rect_filled(rect, 0.0, koyu().zem);

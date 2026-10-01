@@ -1,30 +1,25 @@
 //! `cargo run --release --example ornek` — temanın canlı önizlemesi.
 
-use kilim_tema::{boncuk_dugme, cerceve, Boncuk, Varyant};
+use kilim_tema::{boncuk_dugme, cerceve, tema_secici, Boncuk, TemaTercihi, Varyant};
+
+const UYGULAMA: &str = "ornek";
 
 struct Ornek {
-    varyant: Varyant,
+    tercih: TemaTercihi,
     tiklama: u32,
 }
 
 impl eframe::App for Ornek {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        let varyant = self.varyant;
-        cerceve(ui, varyant, |ui| {
+        let tercih = self.tercih;
+        cerceve(ui, &tercih, |ui| {
             egui::Panel::top("ust").show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.heading("kilim-tema önizleme");
                     ui.separator();
-                    ui.selectable_value(
-                        &mut self.varyant,
-                        Varyant::CamGobegiAltin,
-                        "Cam göbeği + altın",
-                    );
-                    ui.selectable_value(
-                        &mut self.varyant,
-                        Varyant::KirmiziYesil,
-                        "Kırmızı + yeşil",
-                    );
+                    if tema_secici(ui, &mut self.tercih) {
+                        self.tercih.kaydet(UYGULAMA);
+                    }
                 });
             });
             egui::Panel::left("sol").default_size(220.0).show(ui, |ui| {
@@ -37,7 +32,15 @@ impl eframe::App for Ornek {
                 ui.label("Semerkant kâğıdı zemin döşenir, lekeler gerilir; kenarlık birimi tam sayıda tekrar eder.");
                 ui.add_space(12.0);
                 ui.horizontal(|ui| {
-                    for (b, s) in [(Boncuk::Firuze, "+"), (Boncuk::Akik, "×"), (Boncuk::Lapis, "?"), (Boncuk::Telkari, "="), (Boncuk::Sirma, "★"), (Boncuk::Tesbih, "⟳"), (Boncuk::Nazar, "")] {
+                    for (b, s) in [
+                        (Boncuk::Firuze, "+"),
+                        (Boncuk::Akik, "×"),
+                        (Boncuk::Lapis, "?"),
+                        (Boncuk::Telkari, "="),
+                        (Boncuk::Sirma, "★"),
+                        (Boncuk::Tesbih, "⟳"),
+                        (Boncuk::Nazar, ""),
+                    ] {
                         if boncuk_dugme(ui, b, s, 40.0).clicked() {
                             self.tiklama += 1;
                         }
@@ -63,11 +66,11 @@ fn main() -> eframe::Result {
         "kilim-tema önizleme",
         secenek,
         Box::new(|cc| {
-            kilim_tema::acik().uygula(&cc.egui_ctx, false);
-            Ok(Box::new(Ornek {
-                varyant: Varyant::CamGobegiAltin,
-                tiklama: 0,
-            }))
+            kilim_tema::iki_temayi_kur(&cc.egui_ctx);
+            let tercih =
+                TemaTercihi::yukle(UYGULAMA, TemaTercihi::varsayilan(Varyant::CamGobegiAltin));
+            tercih.uygula(&cc.egui_ctx);
+            Ok(Box::new(Ornek { tercih, tiklama: 0 }))
         }),
     )
 }

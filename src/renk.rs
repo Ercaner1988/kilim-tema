@@ -83,6 +83,10 @@ impl Kilim {
     }
 
     pub fn uygula(&self, ctx: &egui::Context, koyu_mu: bool) {
+        ctx.set_visuals(self.gorsel(koyu_mu));
+    }
+
+    pub fn gorsel(&self, koyu_mu: bool) -> egui::Visuals {
         let mut v = if koyu_mu {
             egui::Visuals::dark()
         } else {
@@ -98,8 +102,15 @@ impl Kilim {
         v.widgets.hovered.bg_stroke.color = self.cini;
         v.hyperlink_color = self.cini;
         v.selection.bg_fill = self.cini.gamma_multiply(0.35);
-        ctx.set_visuals(v);
+        v
     }
+}
+
+/// Açık ve koyu Kilim görsellerini egui'ye birlikte kurar; hangisinin görüneceğini
+/// `TemaTercihi::uygula` (ThemePreference) seçer.
+pub fn iki_temayi_kur(ctx: &egui::Context) {
+    ctx.set_visuals_of(egui::Theme::Light, acik().gorsel(false));
+    ctx.set_visuals_of(egui::Theme::Dark, koyu().gorsel(true));
 }
 
 /// "Geçiş hızı" tercihi — egui'nin yerleşik widget'larının (CollapsingHeader vb.)
