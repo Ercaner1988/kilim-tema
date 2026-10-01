@@ -26,8 +26,9 @@ use egui::{
 pub const KALINLIK: f32 = 32.0;
 /// Kâğıt karosu 1 doku pikseli = 0.5 mantıksal px (2x ekranda birebir).
 const KAGIT_OLCEK: f32 = 0.5;
-/// Koyu temada kâğıda çarpılan ton: sonuç ≈ `koyu().zem`, kartlar (`yuzey`) bir tık açık kalır.
-pub const KOYU_KAGIT: Color32 = Color32::from_rgb(40, 35, 29);
+/// Koyu temada kâğıda çarpılan ton: kâğıt `koyu().yuzey`den bir tık açık kalır,
+/// kutular/kartlar onun üstünde koyu durur (doku görünür, açık mürekkep okunur).
+pub const KOYU_KAGIT: Color32 = Color32::from_rgb(60, 52, 43);
 pub(crate) const UV_TAM: Rect = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
