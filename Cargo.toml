@@ -5,6 +5,9 @@ edition = "2021"
 license = "MIT"
 description = "Ortak egui teması: Kilim paleti, Semerkant kâğıdı zemini, Yörük kilimi kenarlık, boncuk düğmeler"
 
+[workspace]
+members = [".", "isle"]
+
 [dependencies]
 egui = "0.36"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }

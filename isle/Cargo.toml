@@ -1,0 +1,10 @@
+[package]
+name = "kilim-isle"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "Gemini ham görsellerini kilim-tema varlıklarına çevirir (assets/ altına yazar)"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
