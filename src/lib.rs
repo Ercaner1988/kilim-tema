@@ -105,7 +105,14 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect, ton: Color32) {
         (rect.max.to_vec2() / karo).to_pos2(),
     );
     painter.image(d.kagit.id(), rect, uv, ton);
-    painter.image(d.leke.id(), rect, UV_TAM, ton);
+    // Leke bütün pencereye gerilir; küçük kutu (sekme, metin kutusu) kendi payını alır,
+    // yoksa lekenin koyu kenarları her kutunun ucunda şerit olur.
+    let pencere = painter.ctx().content_rect();
+    let pay = Rect::from_min_max(
+        ((rect.min - pencere.min) / pencere.size()).to_pos2(),
+        ((rect.max - pencere.min) / pencere.size()).to_pos2(),
+    );
+    painter.image(d.leke.id(), rect, pay, ton);
 }
 
 fn dortgen(m: &mut Mesh, p: [Pos2; 4], uv: [Pos2; 4]) {
