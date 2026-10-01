@@ -14,7 +14,9 @@ pub use doku::{dokular, Dokular, Kenarlik};
 pub use renk::{acik, gecis_uygula, koyu, Kilim};
 
 use egui::epaint::{Mesh, Vertex};
-use egui::{pos2, vec2, Align2, Color32, FontId, Painter, Pos2, Rect, Response, Sense, Shape, Ui, UiBuilder};
+use egui::{
+    pos2, vec2, Align2, Color32, FontId, Painter, Pos2, Rect, Response, Sense, Shape, Ui, UiBuilder,
+};
 
 /// Kenarlık kalınlığı (mantıksal px). Dokular 64 px: 2x ekranda birebir.
 pub const KALINLIK: f32 = 32.0;
@@ -46,7 +48,9 @@ pub enum Boncuk {
 impl Boncuk {
     pub fn simge_rengi(self) -> Color32 {
         match self {
-            Boncuk::Akik | Boncuk::Lapis | Boncuk::Tesbih | Boncuk::Nazar => Color32::from_rgb(0xFC, 0xF8, 0xEF),
+            Boncuk::Akik | Boncuk::Lapis | Boncuk::Tesbih | Boncuk::Nazar => {
+                Color32::from_rgb(0xFC, 0xF8, 0xEF)
+            }
             _ => Color32::from_rgb(0x3A, 0x2D, 0x21),
         }
     }
@@ -57,7 +61,10 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect) {
     let d = dokular(painter.ctx());
     let karo = d.kagit.size_vec2() * KAGIT_OLCEK;
     // UV ekran konumundan: karo pencerenin sol üstüne sabit, panel/rect değişse de kaymaz.
-    let uv = Rect::from_min_max((rect.min.to_vec2() / karo).to_pos2(), (rect.max.to_vec2() / karo).to_pos2());
+    let uv = Rect::from_min_max(
+        (rect.min.to_vec2() / karo).to_pos2(),
+        (rect.max.to_vec2() / karo).to_pos2(),
+    );
     painter.image(d.kagit.id(), rect, uv, Color32::WHITE);
     painter.image(d.leke.id(), rect, UV_TAM, Color32::WHITE);
 }
@@ -65,7 +72,11 @@ pub fn kagit_ciz(painter: &Painter, rect: Rect) {
 fn dortgen(m: &mut Mesh, p: [Pos2; 4], uv: [Pos2; 4]) {
     let i = m.vertices.len() as u32;
     for k in 0..4 {
-        m.vertices.push(Vertex { pos: p[k], uv: uv[k], color: Color32::WHITE });
+        m.vertices.push(Vertex {
+            pos: p[k],
+            uv: uv[k],
+            color: Color32::WHITE,
+        });
     }
     m.add_triangle(i, i + 1, i + 2);
     m.add_triangle(i, i + 2, i + 3);
@@ -82,18 +93,66 @@ pub fn kenarlik_ciz(painter: &Painter, rect: Rect, varyant: Varyant, t: f32) {
     let k = d.kenarlik(varyant);
     let birim = k.kenar.aspect_ratio() * t;
     let (x0, y0, x1, y1) = (rect.left(), rect.top(), rect.right(), rect.bottom());
-    let (yatay, dikey) = (tekrar(x1 - x0 - 2.0 * t, birim), tekrar(y1 - y0 - 2.0 * t, birim));
+    let (yatay, dikey) = (
+        tekrar(x1 - x0 - 2.0 * t, birim),
+        tekrar(y1 - y0 - 2.0 * t, birim),
+    );
     let (xa, xb, ya, yb) = (x0 + t, x1 - t, y0 + t, y1 - t);
     let mut m = Mesh::with_texture(k.kenar.id());
     // v=0 her zaman dış kenarda; u kenar boyunca 0..n.
-    dortgen(&mut m, [pos2(xa, y0), pos2(xb, y0), pos2(xb, ya), pos2(xa, ya)], [pos2(0.0, 0.0), pos2(yatay, 0.0), pos2(yatay, 1.0), pos2(0.0, 1.0)]);
-    dortgen(&mut m, [pos2(xa, yb), pos2(xb, yb), pos2(xb, y1), pos2(xa, y1)], [pos2(yatay, 1.0), pos2(0.0, 1.0), pos2(0.0, 0.0), pos2(yatay, 0.0)]);
-    dortgen(&mut m, [pos2(x0, ya), pos2(xa, ya), pos2(xa, yb), pos2(x0, yb)], [pos2(dikey, 0.0), pos2(dikey, 1.0), pos2(0.0, 1.0), pos2(0.0, 0.0)]);
-    dortgen(&mut m, [pos2(xb, ya), pos2(x1, ya), pos2(x1, yb), pos2(xb, yb)], [pos2(0.0, 1.0), pos2(0.0, 0.0), pos2(dikey, 0.0), pos2(dikey, 1.0)]);
+    dortgen(
+        &mut m,
+        [pos2(xa, y0), pos2(xb, y0), pos2(xb, ya), pos2(xa, ya)],
+        [
+            pos2(0.0, 0.0),
+            pos2(yatay, 0.0),
+            pos2(yatay, 1.0),
+            pos2(0.0, 1.0),
+        ],
+    );
+    dortgen(
+        &mut m,
+        [pos2(xa, yb), pos2(xb, yb), pos2(xb, y1), pos2(xa, y1)],
+        [
+            pos2(yatay, 1.0),
+            pos2(0.0, 1.0),
+            pos2(0.0, 0.0),
+            pos2(yatay, 0.0),
+        ],
+    );
+    dortgen(
+        &mut m,
+        [pos2(x0, ya), pos2(xa, ya), pos2(xa, yb), pos2(x0, yb)],
+        [
+            pos2(dikey, 0.0),
+            pos2(dikey, 1.0),
+            pos2(0.0, 1.0),
+            pos2(0.0, 0.0),
+        ],
+    );
+    dortgen(
+        &mut m,
+        [pos2(xb, ya), pos2(x1, ya), pos2(x1, yb), pos2(xb, yb)],
+        [
+            pos2(0.0, 1.0),
+            pos2(0.0, 0.0),
+            pos2(dikey, 0.0),
+            pos2(dikey, 1.0),
+        ],
+    );
     painter.add(Shape::mesh(m));
     let kose = vec2(t, t);
-    for (doku, sol_ust) in k.koseler.iter().zip([pos2(x0, y0), pos2(xb, y0), pos2(xb, yb), pos2(x0, yb)]) {
-        painter.image(doku.id(), Rect::from_min_size(sol_ust, kose), UV_TAM, Color32::WHITE);
+    for (doku, sol_ust) in
+        k.koseler
+            .iter()
+            .zip([pos2(x0, y0), pos2(xb, y0), pos2(xb, yb), pos2(x0, yb)])
+    {
+        painter.image(
+            doku.id(),
+            Rect::from_min_size(sol_ust, kose),
+            UV_TAM,
+            Color32::WHITE,
+        );
     }
 }
 
@@ -125,10 +184,19 @@ pub fn boncuk_dugme(ui: &mut Ui, boncuk: Boncuk, simge: &str, cap: f32) -> Respo
         } else {
             (Color32::WHITE, 0.0)
         };
-        let r = Rect::from_center_size(rect.center() + vec2(0.0, kayma), rect.size() * (1.0 + 0.06 * ustunde));
+        let r = Rect::from_center_size(
+            rect.center() + vec2(0.0, kayma),
+            rect.size() * (1.0 + 0.06 * ustunde),
+        );
         ui.painter().image(d.boncuk(boncuk).id(), r, UV_TAM, ton);
         if !simge.is_empty() && boncuk != Boncuk::Nazar {
-            ui.painter().text(r.center(), Align2::CENTER_CENTER, simge, FontId::proportional(cap * 0.45), boncuk.simge_rengi());
+            ui.painter().text(
+                r.center(),
+                Align2::CENTER_CENTER,
+                simge,
+                FontId::proportional(cap * 0.45),
+                boncuk.simge_rengi(),
+            );
         }
     }
     cevap

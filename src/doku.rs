@@ -2,7 +2,9 @@
 
 use std::sync::Arc;
 
-use egui::{ColorImage, Context, Id, TextureFilter, TextureHandle, TextureOptions, TextureWrapMode};
+use egui::{
+    ColorImage, Context, Id, TextureFilter, TextureHandle, TextureOptions, TextureWrapMode,
+};
 
 use crate::{Boncuk, Varyant};
 
@@ -34,15 +36,25 @@ impl Dokular {
 }
 
 fn yukle(ctx: &Context, ad: &str, bayt: &[u8], dosemeli: bool) -> TextureHandle {
-    let img = image::load_from_memory(bayt).expect("gömülü tema varlığı çözülemedi").to_rgba8();
+    let img = image::load_from_memory(bayt)
+        .expect("gömülü tema varlığı çözülemedi")
+        .to_rgba8();
     let boyut = [img.width() as usize, img.height() as usize];
     let opt = TextureOptions {
         magnification: TextureFilter::Linear,
         minification: TextureFilter::Linear,
-        wrap_mode: if dosemeli { TextureWrapMode::Repeat } else { TextureWrapMode::ClampToEdge },
+        wrap_mode: if dosemeli {
+            TextureWrapMode::Repeat
+        } else {
+            TextureWrapMode::ClampToEdge
+        },
         mipmap_mode: Some(TextureFilter::Linear),
     };
-    ctx.load_texture(ad, ColorImage::from_rgba_unmultiplied(boyut, img.as_raw()), opt)
+    ctx.load_texture(
+        ad,
+        ColorImage::from_rgba_unmultiplied(boyut, img.as_raw()),
+        opt,
+    )
 }
 
 macro_rules! varlik {
@@ -54,12 +66,37 @@ macro_rules! varlik {
 macro_rules! kenarlik {
     ($ctx:expr, $v:literal) => {
         Kenarlik {
-            kenar: yukle($ctx, concat!($v, "/kenar"), varlik!(concat!($v, "/kenar.png")), true),
+            kenar: yukle(
+                $ctx,
+                concat!($v, "/kenar"),
+                varlik!(concat!($v, "/kenar.png")),
+                true,
+            ),
             koseler: [
-                yukle($ctx, concat!($v, "/sol-ust"), varlik!(concat!($v, "/kose-sol-ust.png")), false),
-                yukle($ctx, concat!($v, "/sag-ust"), varlik!(concat!($v, "/kose-sag-ust.png")), false),
-                yukle($ctx, concat!($v, "/sag-alt"), varlik!(concat!($v, "/kose-sag-alt.png")), false),
-                yukle($ctx, concat!($v, "/sol-alt"), varlik!(concat!($v, "/kose-sol-alt.png")), false),
+                yukle(
+                    $ctx,
+                    concat!($v, "/sol-ust"),
+                    varlik!(concat!($v, "/kose-sol-ust.png")),
+                    false,
+                ),
+                yukle(
+                    $ctx,
+                    concat!($v, "/sag-ust"),
+                    varlik!(concat!($v, "/kose-sag-ust.png")),
+                    false,
+                ),
+                yukle(
+                    $ctx,
+                    concat!($v, "/sag-alt"),
+                    varlik!(concat!($v, "/kose-sag-alt.png")),
+                    false,
+                ),
+                yukle(
+                    $ctx,
+                    concat!($v, "/sol-alt"),
+                    varlik!(concat!($v, "/kose-sol-alt.png")),
+                    false,
+                ),
             ],
         }
     };

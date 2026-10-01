@@ -15,8 +15,16 @@ impl eframe::App for Ornek {
                 ui.horizontal(|ui| {
                     ui.heading("kilim-tema önizleme");
                     ui.separator();
-                    ui.selectable_value(&mut self.varyant, Varyant::CamGobegiAltin, "Cam göbeği + altın");
-                    ui.selectable_value(&mut self.varyant, Varyant::KirmiziYesil, "Kırmızı + yeşil");
+                    ui.selectable_value(
+                        &mut self.varyant,
+                        Varyant::CamGobegiAltin,
+                        "Cam göbeği + altın",
+                    );
+                    ui.selectable_value(
+                        &mut self.varyant,
+                        Varyant::KirmiziYesil,
+                        "Kırmızı + yeşil",
+                    );
                 });
             });
             egui::Panel::left("sol").default_size(220.0).show(ui, |ui| {
@@ -56,7 +64,10 @@ fn main() -> eframe::Result {
         secenek,
         Box::new(|cc| {
             kilim_tema::acik().uygula(&cc.egui_ctx, false);
-            Ok(Box::new(Ornek { varyant: Varyant::CamGobegiAltin, tiklama: 0 }))
+            Ok(Box::new(Ornek {
+                varyant: Varyant::CamGobegiAltin,
+                tiklama: 0,
+            }))
         }),
     )
 }
