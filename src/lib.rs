@@ -16,8 +16,8 @@ mod tercih;
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
 pub use paket::{
-    etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, paketi_kur, TemaKaynagi,
-    TemaPaketi,
+    etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, paketi_kur,
+    TemaKaynagi, TemaPaketi,
 };
 pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
 pub use tercih::{tema_secici, tema_secici_kaynakli, Aydinlik, Gorunum, TemaTercihi};

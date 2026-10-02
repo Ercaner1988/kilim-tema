@@ -2,7 +2,7 @@
 //! (yerleşik palet beklerler) bozmasın.
 
 use egui::Color32;
-use kilim_tema::{acik, koyu, etkin_paket, paketi_kur, TemaPaketi, Varyant};
+use kilim_tema::{acik, etkin_paket, koyu, paketi_kur, TemaPaketi, Varyant};
 
 #[test]
 fn etkin_paket_palet_ve_vurguyu_degistirir_ve_geri_alinir() {
@@ -18,8 +18,14 @@ fn etkin_paket_palet_ve_vurguyu_degistirir_ve_geri_alinir() {
 
     assert_eq!(acik().zem, Color32::from_rgb(1, 2, 3));
     assert_eq!(koyu().cini, Color32::from_rgb(4, 5, 6));
-    assert_eq!(Varyant::CamGobegiAltin.vurgu(false), Color32::from_rgb(7, 8, 9));
-    assert_eq!(Varyant::CamGobegiAltin.yerlesik_vurgu(false), yerlesik_vurgu);
+    assert_eq!(
+        Varyant::CamGobegiAltin.vurgu(false),
+        Color32::from_rgb(7, 8, 9)
+    );
+    assert_eq!(
+        Varyant::CamGobegiAltin.yerlesik_vurgu(false),
+        yerlesik_vurgu
+    );
     assert_eq!(etkin_paket().unwrap().id, "deneme");
 
     paketi_kur(None);

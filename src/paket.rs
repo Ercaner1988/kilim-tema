@@ -36,8 +36,20 @@ pub trait TemaKaynagi {
 }
 
 const ALANLAR: [&str; 14] = [
-    "zem", "yuzey", "cizgi", "cizgi_koyu", "murekkep", "soluk", "cini", "mercan", "hardal", "yesil",
-    "sari", "kirmizi", "gri", "kontrast",
+    "zem",
+    "yuzey",
+    "cizgi",
+    "cizgi_koyu",
+    "murekkep",
+    "soluk",
+    "cini",
+    "mercan",
+    "hardal",
+    "yesil",
+    "sari",
+    "kirmizi",
+    "gri",
+    "kontrast",
 ];
 
 fn alan_oku(k: &Kilim, ad: &str) -> Option<Color32> {
@@ -121,10 +133,17 @@ impl TemaPaketi {
             if s.is_empty() || s.starts_with(';') {
                 continue;
             }
-            let (k, v) = s.split_once('=').ok_or(format!("satır {}: '=' yok", no + 1))?;
+            let (k, v) = s
+                .split_once('=')
+                .ok_or(format!("satır {}: '=' yok", no + 1))?;
             let (k, v) = (k.trim(), v.trim());
             match k {
-                "sema" => sema = Some(v.parse::<u32>().map_err(|_| "sema sayı olmalı".to_string())?),
+                "sema" => {
+                    sema = Some(
+                        v.parse::<u32>()
+                            .map_err(|_| "sema sayı olmalı".to_string())?,
+                    )
+                }
                 "id" => p.id = v.into(),
                 "ad" => p.ad = v.into(),
                 "kenarlik" => {
@@ -147,10 +166,19 @@ impl TemaPaketi {
         }
         match sema {
             Some(n) if n <= SEMA => {}
-            Some(n) => return Err(format!("sema {n} bu sürümde desteklenmiyor (en çok {SEMA})")),
+            Some(n) => {
+                return Err(format!(
+                    "sema {n} bu sürümde desteklenmiyor (en çok {SEMA})"
+                ))
+            }
             None => return Err("sema yok".into()),
         }
-        if p.id.is_empty() || !p.id.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-') {
+        if p.id.is_empty()
+            || !p
+                .id
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        {
             return Err("id boş ya da [a-z0-9-] dışında".into());
         }
         if p.ad.is_empty() {
@@ -170,7 +198,10 @@ impl TemaPaketi {
         );
         for (onek, k) in [("acik", &self.acik), ("koyu", &self.koyu)] {
             for a in ALANLAR {
-                s.push_str(&format!("{onek}.{a}={}\n", hex_yaz(alan_oku(k, a).expect("bilinen alan"))));
+                s.push_str(&format!(
+                    "{onek}.{a}={}\n",
+                    hex_yaz(alan_oku(k, a).expect("bilinen alan"))
+                ));
             }
         }
         s
@@ -189,11 +220,19 @@ pub fn etkin_paket() -> Option<TemaPaketi> {
 }
 
 pub(crate) fn etkin_palet(koyu: bool) -> Option<Kilim> {
-    ETKIN.read().unwrap().as_ref().map(|p| if koyu { p.koyu } else { p.acik })
+    ETKIN
+        .read()
+        .unwrap()
+        .as_ref()
+        .map(|p| if koyu { p.koyu } else { p.acik })
 }
 
 pub(crate) fn etkin_vurgu(koyu: bool) -> Option<Color32> {
-    ETKIN.read().unwrap().as_ref().map(|p| if koyu { p.vurgu_koyu } else { p.vurgu_acik })
+    ETKIN
+        .read()
+        .unwrap()
+        .as_ref()
+        .map(|p| if koyu { p.vurgu_koyu } else { p.vurgu_acik })
 }
 
 pub(crate) fn uygulama_dosyasi(uygulama: &str, uzanti: &str) -> Option<PathBuf> {
@@ -255,7 +294,10 @@ mod sinama {
 
     #[test]
     fn eksik_anahtar_yerlesigi_korur_bilinmeyen_yok_sayilir() {
-        let p = TemaPaketi::coz("sema=1\nid=x\nacik.zem=#010203\ngelecek.anahtar=1\nacik.yeni_alan=#000000\n").unwrap();
+        let p = TemaPaketi::coz(
+            "sema=1\nid=x\nacik.zem=#010203\ngelecek.anahtar=1\nacik.yeni_alan=#000000\n",
+        )
+        .unwrap();
         assert_eq!(p.acik.zem, Color32::from_rgb(1, 2, 3));
         assert_eq!(p.acik.yuzey, yerlesik_acik().yuzey);
         assert_eq!(p.koyu, yerlesik_koyu());

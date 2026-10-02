@@ -119,7 +119,11 @@ pub fn tema_secici_kaynakli(
     secici(ui, tercih, Some((uygulama, kaynak)))
 }
 
-fn secici(ui: &mut Ui, tercih: &mut TemaTercihi, paketler: Option<(&str, &dyn TemaKaynagi)>) -> bool {
+fn secici(
+    ui: &mut Ui,
+    tercih: &mut TemaTercihi,
+    paketler: Option<(&str, &dyn TemaKaynagi)>,
+) -> bool {
     let once = *tercih;
     let mut paket_degisti = false;
     let dugme = crate::boncuklu(ui, crate::Boncuk::Kehribar, "Tema");
