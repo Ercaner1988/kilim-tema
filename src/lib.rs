@@ -9,13 +9,18 @@
 
 mod doku;
 mod dugme;
+mod paket;
 mod renk;
 mod tercih;
 
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
+pub use paket::{
+    etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, paketi_kur, TemaKaynagi,
+    TemaPaketi,
+};
 pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
-pub use tercih::{tema_secici, Aydinlik, Gorunum, TemaTercihi};
+pub use tercih::{tema_secici, tema_secici_kaynakli, Aydinlik, Gorunum, TemaTercihi};
 
 use egui::epaint::{Mesh, Vertex};
 use egui::{
@@ -38,9 +43,15 @@ pub enum Varyant {
 }
 
 impl Varyant {
-    /// Seçim/vurgu rengi kenarlıktan: cam göbeği → firuze, kırmızı-yeşil → kök boya.
+    /// Seçim/vurgu rengi: etkin tema paketi varsa onun, yoksa kenarlıktan (cam göbeği →
+    /// firuze, kırmızı-yeşil → kök boya).
     /// Açıkta üstüne açık yazı, koyuda koyu yazı gelir (ikisi de WCAG AA, sınamada).
     pub fn vurgu(self, koyu_mu: bool) -> Color32 {
+        crate::paket::etkin_vurgu(koyu_mu).unwrap_or_else(|| self.yerlesik_vurgu(koyu_mu))
+    }
+
+    /// Etkin tema paketine bakmadan koddaki vurgu.
+    pub fn yerlesik_vurgu(self, koyu_mu: bool) -> Color32 {
         match (self, koyu_mu) {
             (Varyant::CamGobegiAltin, false) => Color32::from_rgb(0x0E, 0x7C, 0x86),
             (Varyant::CamGobegiAltin, true) => Color32::from_rgb(0x5C, 0xC3, 0xC9),

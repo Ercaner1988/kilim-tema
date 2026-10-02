@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use egui::{ThemePreference, Ui};
 
-use crate::Varyant;
+use crate::{TemaKaynagi, Varyant};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Gorunum {
@@ -72,7 +72,9 @@ impl TemaTercihi {
         t
     }
 
+    /// Tercihi okur ve uygulamanın kayıtlı tema paketini (varsa) etkin kılar.
     pub fn yukle(uygulama: &str, varsayilan: Self) -> Self {
+        crate::etkin_paketi_yukle(uygulama);
         dosya(uygulama)
             .and_then(|d| std::fs::read_to_string(d).ok())
             .map_or(varsayilan, |m| Self::coz(&m, varsayilan))
@@ -98,21 +100,28 @@ impl TemaTercihi {
 }
 
 fn dosya(uygulama: &str) -> Option<PathBuf> {
-    let kok = if cfg!(windows) {
-        std::env::var_os("APPDATA").map(PathBuf::from)
-    } else if cfg!(target_os = "macos") {
-        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support"))
-    } else {
-        std::env::var_os("XDG_CONFIG_HOME")
-            .map(PathBuf::from)
-            .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
-    }?;
-    Some(kok.join("kilim-tema").join(format!("{uygulama}.txt")))
+    crate::paket::uygulama_dosyasi(uygulama, "txt")
 }
 
 /// "Tema" menüsü. Değişiklik olursa `uygula` çağrılmış olarak `true` döner (kaydetmek çağırana kalır).
 pub fn tema_secici(ui: &mut Ui, tercih: &mut TemaTercihi) -> bool {
+    secici(ui, tercih, None)
+}
+
+/// [`tema_secici`] + "Tema paketi" bölümü: katalogdaki paketler listelenir, seçilen
+/// `uygulama` için kaydedilir ve hemen uygulanır. Katalog yalnız menü açıkken sorulur.
+pub fn tema_secici_kaynakli(
+    ui: &mut Ui,
+    tercih: &mut TemaTercihi,
+    uygulama: &str,
+    kaynak: &dyn TemaKaynagi,
+) -> bool {
+    secici(ui, tercih, Some((uygulama, kaynak)))
+}
+
+fn secici(ui: &mut Ui, tercih: &mut TemaTercihi, paketler: Option<(&str, &dyn TemaKaynagi)>) -> bool {
     let once = *tercih;
+    let mut paket_degisti = false;
     let dugme = crate::boncuklu(ui, crate::Boncuk::Kehribar, "Tema");
     egui::containers::menu::MenuButton::from_button(dugme).ui(ui, |ui| {
         ui.label("Görünüm");
@@ -144,9 +153,33 @@ pub fn tema_secici(ui: &mut Ui, tercih: &mut TemaTercihi) -> bool {
         crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Sistem, "Sistemi izle");
         crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Acik, "Açık");
         crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Koyu, "Koyu");
+        if let Some((uygulama, kaynak)) = paketler {
+            ui.separator();
+            ui.label("Tema paketi");
+            let etkin = crate::etkin_paket().map(|p| p.id);
+            if ui.selectable_label(etkin.is_none(), "Yerleşik").clicked() && etkin.is_some() {
+                crate::paketi_kur(None);
+                crate::etkin_paketi_sil(uygulama);
+                paket_degisti = true;
+            }
+            for (id, ad) in kaynak.liste() {
+                let secili = etkin.as_deref() == Some(id.as_str());
+                if ui.selectable_label(secili, ad).clicked() && !secili {
+                    if let Some(p) = kaynak.getir(&id) {
+                        tercih.varyant = p.kenarlik;
+                        crate::etkin_paketi_kaydet(uygulama, &p);
+                        crate::paketi_kur(Some(p));
+                        paket_degisti = true;
+                    }
+                }
+            }
+        }
     });
-    let degisti = *tercih != once;
+    let degisti = *tercih != once || paket_degisti;
     if degisti {
+        if paket_degisti {
+            crate::iki_temayi_kur(ui.ctx());
+        }
         tercih.uygula(ui.ctx());
     }
     degisti

@@ -2,7 +2,7 @@
 
 use egui::Color32;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Kilim {
     pub zem: Color32,
     pub yuzey: Color32,
@@ -33,7 +33,17 @@ fn hex(s: &str) -> Color32 {
     Color32::from_rgb(r, g, b)
 }
 
+/// Etkin tema paketinin açık paleti; paket yoksa yerleşik Kilim.
 pub fn acik() -> Kilim {
+    crate::paket::etkin_palet(false).unwrap_or_else(yerlesik_acik)
+}
+
+/// Etkin tema paketinin koyu paleti; paket yoksa yerleşik Kilim.
+pub fn koyu() -> Kilim {
+    crate::paket::etkin_palet(true).unwrap_or_else(yerlesik_koyu)
+}
+
+pub(crate) fn yerlesik_acik() -> Kilim {
     Kilim {
         zem: hex("#F4ECDB"),
         yuzey: hex("#FCF8EF"),
@@ -52,7 +62,7 @@ pub fn acik() -> Kilim {
     }
 }
 
-pub fn koyu() -> Kilim {
+pub(crate) fn yerlesik_koyu() -> Kilim {
     Kilim {
         zem: hex("#241F19"),
         yuzey: hex("#2E2820"),
