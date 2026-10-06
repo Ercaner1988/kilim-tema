@@ -107,7 +107,9 @@ impl Kilim {
         v.override_text_color = Some(self.murekkep);
         v.widgets.noninteractive.bg_fill = self.yuzey;
         v.widgets.noninteractive.bg_stroke.color = self.cizgi;
-        v.widgets.inactive.bg_fill = self.yuzey;
+        // Onay kutusu, radyo ve kaydırma tutamacının dolgusu: zeminden (yuzey/zem)
+        // ayrışmalı, yoksa işaretsiz kutu pencerede görünmez. Düğmeler weak_bg_fill kullanır.
+        v.widgets.inactive.bg_fill = self.cizgi_koyu;
         v.widgets.inactive.bg_stroke.color = self.cizgi;
         v.widgets.hovered.bg_stroke.color = self.cini;
         v.hyperlink_color = self.cini;

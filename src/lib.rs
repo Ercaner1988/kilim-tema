@@ -319,3 +319,17 @@ mod vurgu_sinama {
         }
     }
 }
+
+#[cfg(test)]
+mod kutu_sinama {
+    /// Onay kutusu dolgusu iki zeminde de seçilebilmeli (eskiden yuzey = pencere zemini idi).
+    #[test]
+    fn isaretsiz_kutu_zeminden_ayrisir() {
+        for (k, koyu_mu) in [(super::acik(), false), (super::koyu(), true)] {
+            let v = k.gorsel(koyu_mu);
+            let kutu = v.widgets.inactive.bg_fill;
+            assert_ne!(kutu, v.window_fill, "koyu={koyu_mu}");
+            assert_ne!(kutu, v.panel_fill, "koyu={koyu_mu}");
+        }
+    }
+}
