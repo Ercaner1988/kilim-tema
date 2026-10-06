@@ -127,58 +127,63 @@ fn secici(
     let once = *tercih;
     let mut paket_degisti = false;
     let dugme = crate::boncuklu(ui, crate::Boncuk::Kehribar, "Tema");
-    egui::containers::menu::MenuButton::from_button(dugme).ui(ui, |ui| {
-        ui.label("Görünüm");
-        crate::secim(
-            ui,
-            &mut tercih.gorunum,
-            Gorunum::Kilim,
-            "Kilim (kâğıt + kenarlık)",
-        );
-        crate::secim(ui, &mut tercih.gorunum, Gorunum::Sade, "Sade (dokusuz)");
-        ui.separator();
-        ui.add_enabled_ui(tercih.gorunum == Gorunum::Kilim, |ui| {
-            ui.label("Kenarlık");
+    // Seçimde açık kalır (görünüm + kenarlık + aydınlık tek açılışta); dışarı tıklayınca kapanır.
+    let ayar = egui::containers::menu::MenuConfig::new()
+        .close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside);
+    egui::containers::menu::MenuButton::from_button(dugme)
+        .config(ayar)
+        .ui(ui, |ui| {
+            ui.label("Görünüm");
             crate::secim(
                 ui,
-                &mut tercih.varyant,
-                Varyant::CamGobegiAltin,
-                "Cam göbeği + altın",
+                &mut tercih.gorunum,
+                Gorunum::Kilim,
+                "Kilim (kâğıt + kenarlık)",
             );
-            crate::secim(
-                ui,
-                &mut tercih.varyant,
-                Varyant::KirmiziYesil,
-                "Kırmızı + yeşil",
-            );
-        });
-        ui.separator();
-        ui.label("Aydınlık");
-        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Sistem, "Sistemi izle");
-        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Acik, "Açık");
-        crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Koyu, "Koyu");
-        if let Some((uygulama, kaynak)) = paketler {
+            crate::secim(ui, &mut tercih.gorunum, Gorunum::Sade, "Sade (dokusuz)");
             ui.separator();
-            ui.label("Tema paketi");
-            let etkin = crate::etkin_paket().map(|p| p.id);
-            if ui.selectable_label(etkin.is_none(), "Yerleşik").clicked() && etkin.is_some() {
-                crate::paketi_kur(None);
-                crate::etkin_paketi_sil(uygulama);
-                paket_degisti = true;
-            }
-            for (id, ad) in kaynak.liste() {
-                let secili = etkin.as_deref() == Some(id.as_str());
-                if ui.selectable_label(secili, ad).clicked() && !secili {
-                    if let Some(p) = kaynak.getir(&id) {
-                        tercih.varyant = p.kenarlik;
-                        crate::etkin_paketi_kaydet(uygulama, &p);
-                        crate::paketi_kur(Some(p));
-                        paket_degisti = true;
+            ui.add_enabled_ui(tercih.gorunum == Gorunum::Kilim, |ui| {
+                ui.label("Kenarlık");
+                crate::secim(
+                    ui,
+                    &mut tercih.varyant,
+                    Varyant::CamGobegiAltin,
+                    "Cam göbeği + altın",
+                );
+                crate::secim(
+                    ui,
+                    &mut tercih.varyant,
+                    Varyant::KirmiziYesil,
+                    "Kırmızı + yeşil",
+                );
+            });
+            ui.separator();
+            ui.label("Aydınlık");
+            crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Sistem, "Sistemi izle");
+            crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Acik, "Açık");
+            crate::secim(ui, &mut tercih.aydinlik, Aydinlik::Koyu, "Koyu");
+            if let Some((uygulama, kaynak)) = paketler {
+                ui.separator();
+                ui.label("Tema paketi");
+                let etkin = crate::etkin_paket().map(|p| p.id);
+                if ui.selectable_label(etkin.is_none(), "Yerleşik").clicked() && etkin.is_some() {
+                    crate::paketi_kur(None);
+                    crate::etkin_paketi_sil(uygulama);
+                    paket_degisti = true;
+                }
+                for (id, ad) in kaynak.liste() {
+                    let secili = etkin.as_deref() == Some(id.as_str());
+                    if ui.selectable_label(secili, ad).clicked() && !secili {
+                        if let Some(p) = kaynak.getir(&id) {
+                            tercih.varyant = p.kenarlik;
+                            crate::etkin_paketi_kaydet(uygulama, &p);
+                            crate::paketi_kur(Some(p));
+                            paket_degisti = true;
+                        }
                     }
                 }
             }
-        }
-    });
+        });
     let degisti = *tercih != once || paket_degisti;
     if degisti {
         if paket_degisti {
