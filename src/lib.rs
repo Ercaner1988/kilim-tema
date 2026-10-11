@@ -12,6 +12,7 @@ mod dugme;
 mod paket;
 mod renk;
 mod tercih;
+mod yerlesim;
 
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
@@ -21,6 +22,7 @@ pub use paket::{
 };
 pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
 pub use tercih::{tema_secici, tema_secici_kaynakli, Aydinlik, Gorunum, TemaTercihi};
+pub use yerlesim::{alan_satiri, birim, sabit_genislik, sarma_kur, tablo};
 
 use egui::epaint::{Mesh, Vertex};
 use egui::{
