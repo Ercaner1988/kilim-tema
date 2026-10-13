@@ -1,0 +1,14 @@
+[package]
+name = "kilim-tarama"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "egui kaynaklarını durağan tarar: bölgeleri saptar, Rol önerir, işaretçi talep listesi ve yerleşim planı üretir (kilim-tema ADR 0001)"
+
+# Bağımlılık YOK: sözcüksel tarama (syn karşılaştırması ADR 0001 §Saptama).
+[dependencies]
+
+[dev-dependencies]
+# Rol adlarının kilim-tema'daki enum ile aynı kaldığını sınamak için (yalnız sınama).
+kilim-tema = { path = ".." }

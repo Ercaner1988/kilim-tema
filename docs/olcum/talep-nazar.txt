@@ -1,0 +1,28 @@
+=== İŞARETÇİ TALEPLERİ: nazar ===
+
+-- araç düzeyi
+src/main.rs:149  [KURULUM] giriş `run_native` var, `kilim_tema::giydir` yok
+    gerekçe: giydir = iki_temayi_kur + sarma_kur + tercih.uygula + (KILIM_ROL_IZ=1 ise) rol bindirmesi; şu an eksik olanlar: sarma_kur
+    önce : Box::new(|cc| { .. kendi tema/sarma çağrıları .. })
+    sonra: Box::new(|cc| { let tercih = kilim_tema::TemaTercihi::yukle("<uygulama>", kilim_tema::TemaTercihi::varsayilan(kilim_tema::Varyant::CamGobegiAltin)); kilim_tema::giydir(&cc.egui_ctx, &tercih); .. })
+
+-- src/arayuz.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+src/arayuz.rs:160  [ROL] Panel::top("ust") -> Rol::UstCubuk  [araç kendi .frame(..)'ini veriyor: .rol(..) ondan önce girer, çerçeve aracınki kalır]
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .frame(cerceve)
+    sonra: .rol(Rol::UstCubuk).frame(cerceve)
+src/arayuz.rs:164  [ROL] Panel::bottom("alt") -> Rol::DurumCubugu  [araç kendi .frame(..)'ini veriyor: .rol(..) ondan önce girer, çerçeve aracınki kalır]
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .frame(cerceve)
+    sonra: .rol(Rol::DurumCubugu).frame(cerceve)
+src/arayuz.rs:167  [ROL] CentralPanel -> Rol::Zemin
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::CentralPanel::no_frame().show(ui, |ui| {
+    sonra: egui::CentralPanel::no_frame().rol(Rol::Zemin).frame(egui::Frame::NONE).show(ui, |ui| {
+src/arayuz.rs:735  [IZGARA] Grid("ayar-izgara") sarılı değil
+    gerekçe: Grid sütun genişliğini önceki kareden ölçer: sarmada sıçrar (yerlesim.rs kök neden 3)
+    önce : egui::Grid::new("ayar-izgara")
+    sonra: kısa hücreli tablo: let grid = egui::Grid::new(..); kilim_tema::tablo(ui, grid, |ui| ..)  |  uzun değerli form: kilim_tema::alan_satiri(ui, sol_genislik, ad, |ui| ..)
+
+Toplam talep: 5
+

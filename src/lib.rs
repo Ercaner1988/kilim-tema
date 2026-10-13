@@ -6,21 +6,31 @@
 //! - leke/sararma **gerilir** (bulanık, gerilmesi görünmez);
 //! - kilim kenarlık **9 dilim**: köşe sabit, kenar birimi tam sayıda tekrar eder;
 //! - boncuk düğme **sabit boyutlu**, durumlar ton/ölçekle kodda türetilir.
+//!
+//! Otomatik giydirme (ADR `docs/adr/0001-otomatik-giydirme.md`): araç açılışta [`giydir`] çağırır,
+//! bölgelerini `.rol(Rol::..)` ([`RolVer`]) ile işaretler; çerçeve, yazı/sarma kuralı ve `sabit_genislik`
+//! roldan gelir. İşaretsiz bölgeler için durağan tarayıcı `kilim-tarama` (bu depoda `tarama/`) işaretçi
+//! taleplerini üretir. Renk çekirdeği `kilim-palet` sandığındadır; adlar buradan yeniden dışa aktarılır.
 
+mod bolge;
 mod doku;
 mod dugme;
-mod paket;
-mod renk;
+mod rol;
 mod tercih;
 mod yerlesim;
 
+pub use bolge::{
+    bagil_rol, giydir, plan_metni, rol_izi_ekle, rol_kayitlari, Kayit, RolIzi, RolVer, Rolu,
+};
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
-pub use paket::{
-    etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, paketi_kur,
-    TemaKaynagi, TemaPaketi,
+// Renk çekirdeği ayrı sandıkta (sandık sınırı); API aynı kalır.
+pub use kilim_palet::{
+    acik, etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, gecis_uygula,
+    iki_temayi_kur, karsitlik, karsitlik_ayarla, koyu, okunur_metin, paketi_kur, yazi_rengi_ayarla,
+    Kilim, TemaKaynagi, TemaPaketi, Varyant,
 };
-pub use renk::{acik, gecis_uygula, iki_temayi_kur, koyu, Kilim};
+pub use rol::{dugme, etkin_gorunum, rol_ezme, rol_rengi, Rol, RolStili};
 pub use tercih::{tema_secici, tema_secici_kaynakli, Aydinlik, Gorunum, TemaTercihi};
 pub use yerlesim::{alan_satiri, birim, sabit_genislik, sarma_kur, tablo};
 
@@ -37,31 +47,6 @@ const KAGIT_OLCEK: f32 = 0.5;
 /// kutular/kartlar onun üstünde koyu durur (doku görünür, açık mürekkep okunur).
 pub const KOYU_KAGIT: Color32 = Color32::from_rgb(60, 52, 43);
 pub(crate) const UV_TAM: Rect = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Varyant {
-    CamGobegiAltin,
-    KirmiziYesil,
-}
-
-impl Varyant {
-    /// Seçim/vurgu rengi: etkin tema paketi varsa onun, yoksa kenarlıktan (cam göbeği →
-    /// firuze, kırmızı-yeşil → kök boya).
-    /// Açıkta üstüne açık yazı, koyuda koyu yazı gelir (ikisi de WCAG AA, sınamada).
-    pub fn vurgu(self, koyu_mu: bool) -> Color32 {
-        crate::paket::etkin_vurgu(koyu_mu).unwrap_or_else(|| self.yerlesik_vurgu(koyu_mu))
-    }
-
-    /// Etkin tema paketine bakmadan koddaki vurgu.
-    pub fn yerlesik_vurgu(self, koyu_mu: bool) -> Color32 {
-        match (self, koyu_mu) {
-            (Varyant::CamGobegiAltin, false) => Color32::from_rgb(0x0E, 0x7C, 0x86),
-            (Varyant::CamGobegiAltin, true) => Color32::from_rgb(0x5C, 0xC3, 0xC9),
-            (Varyant::KirmiziYesil, false) => Color32::from_rgb(0xA8, 0x32, 0x2B),
-            (Varyant::KirmiziYesil, true) => Color32::from_rgb(0xE0, 0x7A, 0x6E),
-        }
-    }
-}
 
 const VARYANT_ID: &str = "kilim-tema-varyant";
 

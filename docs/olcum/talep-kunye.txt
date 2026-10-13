@@ -1,0 +1,22 @@
+=== İŞARETÇİ TALEPLERİ: kunye ===
+
+-- md-egui/src/ciz.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+md-egui/src/ciz.rs:202  [IZGARA] Grid sarılı değil
+    gerekçe: Grid sütun genişliğini önceki kareden ölçer: sarmada sıçrar (yerlesim.rs kök neden 3)
+    önce : egui::Grid::new(("md-tablo-izgara", sira))
+    sonra: kısa hücreli tablo: let grid = egui::Grid::new(..); kilim_tema::tablo(ui, grid, |ui| ..)  |  uzun değerli form: kilim_tema::alan_satiri(ui, sol_genislik, ad, |ui| ..)
+
+-- sohbet-egui/src/istem_pencere.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+sohbet-egui/src/istem_pencere.rs:26  [ROL] Window("Hazır istemleri düzenle") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| {
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| {
+
+-- sohbet-egui/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+sohbet-egui/src/lib.rs:49  [ROL] Panel::bottom -> Rol::DurumCubugu  [araç kendi .frame(..)'ini veriyor: .rol(..) ondan önce girer, çerçeve aracınki kalır]
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .frame(egui::Frame::new().inner_margin(Margin::symmetric(0, 4)))
+    sonra: .rol(Rol::DurumCubugu).frame(egui::Frame::new().inner_margin(Margin::symmetric(0, 4)))
+
+Toplam talep: 3
+

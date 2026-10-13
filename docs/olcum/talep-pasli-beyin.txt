@@ -1,0 +1,248 @@
+=== İŞARETÇİ TALEPLERİ: pasli-beyin ===
+
+-- araç düzeyi
+pencere-egui/src/main.rs:73  [KURULUM] giriş `run_native` var, `kilim_tema::giydir` yok
+    gerekçe: giydir = iki_temayi_kur + sarma_kur + tercih.uygula + (KILIM_ROL_IZ=1 ise) rol bindirmesi; şu an eksik olanlar: iki_temayi_kur
+    önce : Box::new(|cc| { .. kendi tema/sarma çağrıları .. })
+    sonra: Box::new(|cc| { let tercih = kilim_tema::TemaTercihi::yukle("<uygulama>", kilim_tema::TemaTercihi::varsayilan(kilim_tema::Varyant::CamGobegiAltin)); kilim_tema::giydir(&cc.egui_ctx, &tercih); .. })
+
+-- actions-arayuz/src/izleyici.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+actions-arayuz/src/izleyici.rs:282  [ROL] Frame -> Rol::Acilir
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Frame::popup(ui.style()).show(ui, |ui| match &b.metin {
+    sonra: egui::Frame::popup(ui.style()).rol(Rol::Acilir).show(ui, |ui| match &b.metin {
+actions-arayuz/src/izleyici.rs:284  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : Err(h) => ui.colored_label(egui::Color32::RED, h),
+    sonra: Err(h) => ui.colored_label(ui.visuals().error_fg_color, h),
+
+-- arama-kutusu/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+arama-kutusu/src/lib.rs:91  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+arama-kutusu/src/lib.rs:104  [ROL] Frame -> Rol::Acilir
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Frame::popup(ui.style()).show(ui, |ui| {
+    sonra: egui::Frame::popup(ui.style()).rol(Rol::Acilir).show(ui, |ui| {
+arama-kutusu/src/lib.rs:304  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, format!("arama hatası: {h}"));
+    sonra: ui.colored_label(ui.visuals().error_fg_color, format!("arama hatası: {h}"));
+
+-- depo-bolmesi/src/github.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+depo-bolmesi/src/github.rs:381  [ROL] Window("GitHub'a gönder") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+
+-- depo-bolmesi/src/lisans.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+depo-bolmesi/src/lisans.rs:103  [ROL] Window("Lisans önizleme") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+depo-bolmesi/src/lisans.rs:215  [ROL] Window("Özel lisans") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+
+-- git-arayuz/src/degisiklik.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+git-arayuz/src/degisiklik.rs:13  [RENK] sabit Hata rengi: Color32::from_rgb(190,50,50)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : const KIRMIZI: Color32 = Color32::from_rgb(190, 50, 50);
+    sonra: const KIRMIZI: Color32 = ui.visuals().error_fg_color;
+git-arayuz/src/degisiklik.rs:176  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+git-arayuz/src/degisiklik.rs:375  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- git-arayuz/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+git-arayuz/src/lib.rs:26  [RENK] sabit Uyari rengi: Color32::from_rgb(230,180,60)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : const UYARI: Color32 = Color32::from_rgb(230, 180, 60);
+    sonra: const UYARI: Color32 = ui.visuals().warn_fg_color;
+git-arayuz/src/lib.rs:176  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- git-arayuz/src/metin.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+git-arayuz/src/metin.rs:26  [RENK] sabit Uyari rengi: Color32::from_rgb(230,180,60)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : const UYARI: Color32 = Color32::from_rgb(230, 180, 60);
+    sonra: const UYARI: Color32 = ui.visuals().warn_fg_color;
+git-arayuz/src/metin.rs:723  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- is/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+is/src/lib.rs:99  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- kod-gezgin/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+kod-gezgin/src/lib.rs:126  [ROL] Window("kod gezgini") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| acilacak = ciz(ui, self, &depolar));
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| acilacak = ciz(ui, self, &depolar));
+kod-gezgin/src/lib.rs:239  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+kod-gezgin/src/lib.rs:332  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h.clone());
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h.clone());
+
+-- pencere-egui/src/app.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+pencere-egui/src/app.rs:158  [ROL] Panel::top("gorunum") -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::top("gorunum").show(ui, |ui| {
+    sonra: egui::Panel::top("gorunum").rol(Rol::UstCubuk).show(ui, |ui| {
+pencere-egui/src/app.rs:172  [ROL] Panel::bottom("durum_cubugu") -> Rol::DurumCubugu  [araç kendi .frame(..)'ini veriyor: .rol(..) ondan önce girer, çerçeve aracınki kalır]
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .frame(zemin)
+    sonra: .rol(Rol::DurumCubugu).frame(zemin)
+pencere-egui/src/app.rs:178  [ROL] Window("📊 dil lejantı ve tablo") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| {
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| {
+pencere-egui/src/app.rs:275  [ROL] Panel::top("ust_serit") -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::top("ust_serit").show(ui, |ui| {
+    sonra: egui::Panel::top("ust_serit").rol(Rol::UstCubuk).show(ui, |ui| {
+pencere-egui/src/app.rs:311  [COMBO] sarmalı satırda ComboBox birim içinde değil
+    gerekçe: kendi içinde kap açan denetim kalan dar yerde taşar ya da metnini harf harf kırar (yerlesim.rs kök neden 4)
+    önce : let r = egui::ComboBox::from_id_salt("yenile_araligi")
+    sonra: kilim_tema::birim(ui, 170.0, |ui| egui::ComboBox::from_id_salt(..)....show_ui(ui, ..).response)
+pencere-egui/src/app.rs:328  [COMBO] sarmalı satırda ComboBox birim içinde değil
+    gerekçe: kendi içinde kap açan denetim kalan dar yerde taşar ya da metnini harf harf kırar (yerlesim.rs kök neden 4)
+    önce : let r2 = egui::ComboBox::from_id_salt("gecis_hizi")
+    sonra: kilim_tema::birim(ui, 170.0, |ui| egui::ComboBox::from_id_salt(..)....show_ui(ui, ..).response)
+pencere-egui/src/app.rs:366  [ROL] Panel::left("cekmece") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show_collapsible(ui, &mut self.cekmece_acik, |ui| {
+    sonra: .rol(Rol::YanPanel).show_collapsible(ui, &mut self.cekmece_acik, |ui| {
+pencere-egui/src/app.rs:422  [ROL] Window("YZ oturum izleri") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| izleme::izler_ciz(ui, &mut self.izleme));
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| izleme::izler_ciz(ui, &mut self.izleme));
+pencere-egui/src/app.rs:425  [ROL] Window("sağlayıcı kotası") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| izleme::kota_ciz(ui, &mut self.izleme));
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| izleme::kota_ciz(ui, &mut self.izleme));
+pencere-egui/src/app.rs:429  [ROL] Window("sağlayıcı / anahtar") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| {
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| {
+pencere-egui/src/app.rs:439  [ROL] Window("tüm depolar — toplu durum") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui.ctx(), |ui| git_toplu::ciz(ui, &mut self.git_toplu));
+    sonra: .rol(Rol::Pencere).show(ui.ctx(), |ui| git_toplu::ciz(ui, &mut self.git_toplu));
+pencere-egui/src/app.rs:467  [ROL] Panel::right("detay_panel") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show_collapsible(ui, panel_acik, |ui| {
+    sonra: .rol(Rol::YanPanel).show_collapsible(ui, panel_acik, |ui| {
+pencere-egui/src/app.rs:512  [ROL] CentralPanel -> Rol::Zemin
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::CentralPanel::default().show(ui, |ui| match &self.graf {
+    sonra: egui::CentralPanel::default().rol(Rol::Zemin).show(ui, |ui| match &self.graf {
+pencere-egui/src/app.rs:537  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, format!("envanter okunamadı: {hata}"));
+    sonra: ui.colored_label(ui.visuals().error_fg_color, format!("envanter okunamadı: {hata}"));
+
+-- pencere-egui/src/drawer.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+pencere-egui/src/drawer.rs:132  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, "alt < üst olmalı");
+    sonra: ui.colored_label(ui.visuals().error_fg_color, "alt < üst olmalı");
+
+-- pencere-egui/src/git_toplu.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+pencere-egui/src/git_toplu.rs:66  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, format!("✗ {ad}: {h} (atlandı)"))
+    sonra: ui.colored_label(ui.visuals().error_fg_color, format!("✗ {ad}: {h} (atlandı)"))
+pencere-egui/src/git_toplu.rs:123  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- pencere-egui/src/izleme.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+pencere-egui/src/izleme.rs:37  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, format!("ölçüm çağrısı başarısız: {h}"));
+    sonra: ui.colored_label(ui.visuals().error_fg_color, format!("ölçüm çağrısı başarısız: {h}"));
+pencere-egui/src/izleme.rs:95  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- pencere-egui/src/panel.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+pencere-egui/src/panel.rs:170  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+pencere-egui/src/panel.rs:319  [RENK] sabit Hata rengi: Color32::RED
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(egui::Color32::RED, h);
+    sonra: ui.colored_label(ui.visuals().error_fg_color, h);
+
+-- saglayici-arayuz/src/baglanti_paneli.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+saglayici-arayuz/src/baglanti_paneli.rs:22  [RENK] sabit Uyari rengi: Color32::from_rgb(230,170,60)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : const UYARI: Color32 = Color32::from_rgb(230, 170, 60);
+    sonra: const UYARI: Color32 = ui.visuals().warn_fg_color;
+
+-- saglayici-arayuz/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+saglayici-arayuz/src/lib.rs:489  [RENK] sabit Basari rengi: Color32::from_rgb(90,180,110)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : Some(Ok(t)) => ui.colored_label(Color32::from_rgb(90, 180, 110), t),
+    sonra: Some(Ok(t)) => ui.colored_label(kilim_tema::rol_rengi(ui, Rol::Basari), t),
+saglayici-arayuz/src/lib.rs:490  [RENK] sabit Hata rengi: Color32::from_rgb(230,90,90)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : Some(Err(t)) => ui.colored_label(Color32::from_rgb(230, 90, 90), t),
+    sonra: Some(Err(t)) => ui.colored_label(ui.visuals().error_fg_color, t),
+saglayici-arayuz/src/lib.rs:810  [RENK] sabit Uyari rengi: Color32::from_rgb(230,170,60)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::from_rgb(230, 170, 60), u);
+    sonra: ui.colored_label(ui.visuals().warn_fg_color, u);
+
+-- sohbet/src/konak.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+sohbet/src/konak.rs:133  [ROL] Panel::right("sohbet_sutunu") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::YanPanel).show(ui, |ui| {
+
+-- sohbet/src/oturum.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+sohbet/src/oturum.rs:226  [ROL] Panel::top -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::top(ui.id().with("sohbet-ilistir")).show(ui, |ui| {
+    sonra: egui::Panel::top(ui.id().with("sohbet-ilistir")).rol(Rol::UstCubuk).show(ui, |ui| {
+sohbet/src/oturum.rs:227  [YATAY] Panel::top içinde sarmasız horizontal
+    gerekçe: dar pencerede satır sağdan taşar ve kırpılır; sarmalı satır alt satıra iner (pasli K14)
+    önce : ui.horizontal(|ui| {
+    sonra: ui.horizontal_wrapped(|ui| {
+sohbet/src/oturum.rs:279  [ROL] Panel::top -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::top(ui.id().with("sohbet-dosya")).show(ui, |ui| match d {
+    sonra: egui::Panel::top(ui.id().with("sohbet-dosya")).rol(Rol::UstCubuk).show(ui, |ui| match d {
+
+-- tuval/src/denetim.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+tuval/src/denetim.rs:56  [COMBO] sarmalı satırda ComboBox birim içinde değil
+    gerekçe: kendi içinde kap açan denetim kalan dar yerde taşar ya da metnini harf harf kırar (yerlesim.rs kök neden 4)
+    önce : egui::ComboBox::from_label("Tetris Düzeni")
+    sonra: kilim_tema::birim(ui, 170.0, |ui| egui::ComboBox::from_id_salt(..)....show_ui(ui, ..).response)
+tuval/src/denetim.rs:64  [COMBO] sarmalı satırda ComboBox birim içinde değil
+    gerekçe: kendi içinde kap açan denetim kalan dar yerde taşar ya da metnini harf harf kırar (yerlesim.rs kök neden 4)
+    önce : egui::ComboBox::from_label("Arayüz Modu")
+    sonra: kilim_tema::birim(ui, 170.0, |ui| egui::ComboBox::from_id_salt(..)....show_ui(ui, ..).response)
+
+Toplam talep: 51
+

@@ -92,6 +92,16 @@ impl Kilim {
         }
     }
 
+    /// Metin kutusu zemini: koyuda zemden bir tık KOYU (zemle aynı olursa kutu panelde kaybolur), açıkta
+    /// yüzey (zemden açık). `Visuals::extreme_bg_color` ve `Rol::Giris` aynı değeri kullanır.
+    pub fn giris_zemini(&self, koyu_mu: bool) -> Color32 {
+        if koyu_mu {
+            self.zem.lerp_to_gamma(Color32::BLACK, 0.3)
+        } else {
+            self.yuzey
+        }
+    }
+
     pub fn uygula(&self, ctx: &egui::Context, koyu_mu: bool) {
         ctx.set_visuals(self.gorsel(koyu_mu));
     }
@@ -114,6 +124,13 @@ impl Kilim {
         v.widgets.hovered.bg_stroke.color = self.cini;
         v.hyperlink_color = self.cini;
         v.selection.bg_fill = self.cini.gamma_multiply(0.35);
+        // Anlamsal renkler (kunye-egui, sohbet-egui gibi temadan habersiz bileşenler `ui.visuals()`
+        // üzerinden okur): hata/uyarı paletten, yüzeyde AA okunur. Metin kutusu zemini ve şeritli satır
+        // dolgusu da paletten (egui'nin düz siyah/beyaz varsayılanları yerine).
+        v.error_fg_color = yazi_rengi_ayarla(self.kirmizi, self);
+        v.warn_fg_color = yazi_rengi_ayarla(self.sari, self);
+        v.extreme_bg_color = self.giris_zemini(koyu_mu);
+        v.faint_bg_color = self.cizgi.gamma_multiply(0.35);
         v
     }
 }
@@ -129,4 +146,52 @@ pub fn iki_temayi_kur(ctx: &egui::Context) {
 /// ve boncuk düğmenin okuduğu tek global süre.
 pub fn gecis_uygula(ctx: &egui::Context, saniye: f32) {
     ctx.all_styles_mut(|s| s.animation_time = saniye);
+}
+
+// ------------------------------------------------------------------ erişilebilirlik yardımcıları
+
+fn parlaklik(c: Color32) -> f32 {
+    let d = |v: u8| {
+        let v = f32::from(v) / 255.0;
+        if v <= 0.03928 {
+            v / 12.92
+        } else {
+            ((v + 0.055) / 1.055).powf(2.4)
+        }
+    };
+    0.2126 * d(c.r()) + 0.7152 * d(c.g()) + 0.0722 * d(c.b())
+}
+
+/// WCAG 2.x karşıtlık oranı (1..21); iki renk de opak varsayılır.
+pub fn karsitlik(a: Color32, b: Color32) -> f32 {
+    let (x, y) = (parlaklik(a), parlaklik(b));
+    (x.max(y) + 0.05) / (x.min(y) + 0.05)
+}
+
+/// `zemin` üstünde en okunur metin rengi (paletin mürekkebi, yüzeyi, beyaz, siyah arasından).
+pub fn okunur_metin(zemin: Color32, k: &Kilim) -> Color32 {
+    [k.murekkep, k.yuzey, Color32::WHITE, Color32::BLACK]
+        .into_iter()
+        .max_by(|a, b| karsitlik(*a, zemin).total_cmp(&karsitlik(*b, zemin)))
+        .unwrap_or(k.murekkep)
+}
+
+/// `renk`i `zemin` üstünde okunacak yöne (palet mürekkebi okunuyorsa o, yoksa `okunur_metin`) kaydırarak
+/// en az `hedef` karşıtlığa getirir.
+pub fn karsitlik_ayarla(renk: Color32, zemin: Color32, hedef: f32, k: &Kilim) -> Color32 {
+    let yon = if karsitlik(k.murekkep, zemin) >= hedef {
+        k.murekkep
+    } else {
+        okunur_metin(zemin, k)
+    };
+    (0..=20)
+        .map(|i| renk.lerp_to_gamma(yon, i as f32 * 0.05))
+        .find(|c| karsitlik(*c, zemin) >= hedef)
+        .unwrap_or(yon)
+}
+
+/// Anlamlı yazı rengi (hata, uyarı, vurgu...): hem `zem` hem `yuzey` üstünde AA okunur. Mürekkebe doğru
+/// kaydırma her iki zeminde de karşıtlığı tek yönde artırır, o yüzden iki ayar art arda yeter.
+pub fn yazi_rengi_ayarla(renk: Color32, k: &Kilim) -> Color32 {
+    karsitlik_ayarla(karsitlik_ayarla(renk, k.zem, 4.5, k), k.yuzey, 4.5, k)
 }

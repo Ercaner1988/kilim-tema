@@ -1,0 +1,32 @@
+=== İŞARETÇİ TALEPLERİ: el-fihrist ===
+
+-- araç düzeyi
+fihrist-gui/src/lib.rs:46  [KURULUM] giriş `run_native` var, `kilim_tema::giydir` yok
+    gerekçe: giydir = iki_temayi_kur + sarma_kur + tercih.uygula + (KILIM_ROL_IZ=1 ise) rol bindirmesi; şu an eksik olanlar: iki_temayi_kur, sarma_kur, uygula
+    önce : Box::new(|cc| { .. kendi tema/sarma çağrıları .. })
+    sonra: Box::new(|cc| { let tercih = kilim_tema::TemaTercihi::yukle("<uygulama>", kilim_tema::TemaTercihi::varsayilan(kilim_tema::Varyant::CamGobegiAltin)); kilim_tema::giydir(&cc.egui_ctx, &tercih); .. })
+
+-- fihrist-gui/src/app.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+fihrist-gui/src/app.rs:102  [ROL] Panel::top("top_panel") -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::top("top_panel").show(ui, |ui| {
+    sonra: egui::Panel::top("top_panel").rol(Rol::UstCubuk).show(ui, |ui| {
+fihrist-gui/src/app.rs:103  [YATAY] Panel::top içinde sarmasız horizontal
+    gerekçe: dar pencerede satır sağdan taşar ve kırpılır; sarmalı satır alt satıra iner (pasli K14)
+    önce : ui.horizontal(|ui| {
+    sonra: ui.horizontal_wrapped(|ui| {
+fihrist-gui/src/app.rs:122  [ROL] Panel::bottom("bottom_panel") -> Rol::DurumCubugu
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::Panel::bottom("bottom_panel").show(ui, |ui| {
+    sonra: egui::Panel::bottom("bottom_panel").rol(Rol::DurumCubugu).show(ui, |ui| {
+fihrist-gui/src/app.rs:135  [ROL] Panel::left("left_panel") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::YanPanel).show(ui, |ui| {
+fihrist-gui/src/app.rs:159  [ROL] CentralPanel -> Rol::Zemin
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::CentralPanel::default().show(ui, |ui| {
+    sonra: egui::CentralPanel::default().rol(Rol::Zemin).show(ui, |ui| {
+
+Toplam talep: 6
+

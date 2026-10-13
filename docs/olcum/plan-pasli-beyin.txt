@@ -1,0 +1,70 @@
+=== ARAÇ: pasli-beyin (127 dosya) ===
+Giriş (run_native): pencere-egui/src/main.rs
+Kurulum: giydir: YOK | sarma_kur: pencere-egui/src/main.rs:78 | iki_temayi_kur: YOK | uygula: pencere-egui/src/app.rs:214 | cerceve: YOK | tema_secici: YOK | 
+Rol taşıyabilen bölge: 20 (işaretli 0, işaretsiz 20)
+Bulunan öğeler: CentralPanel=1, ComboBox=8, Frame=3, Grid=6, Panel::bottom=1, Panel::left=1, Panel::right=2, Panel::top=4, ScrollArea=17, TextEdit=25, Window=9, düğme=96, dış çağrı=156, horizontal=37, horizontal_wrapped=14, kilim_tema yardımcısı=9, kurulum çağrısı=2, renk sabiti=51, seçim etiketi=20, ui.visuals()=22
+
+Bölge ağacı (dosya sırasıyla):
+  actions-arayuz/src/izleyici.rs:282  Frame  -> Rol::Acilir  [İŞARETSİZ]
+      içerik: boş
+      karar: dolgu yuzey, belirgin çizgi, gölge
+  arama-kutusu/src/lib.rs:104  Frame  -> Rol::Acilir  [İŞARETSİZ]
+      içerik: graf_bolumu() içinde [1 düğme, 1 horizontal], nazar_bolumu() içinde [1 düğme, 1 horizontal], yalin_bolumu() içinde [2 düğme, 1 horizontal]
+      karar: dolgu yuzey, belirgin çizgi, gölge
+  depo-bolmesi/src/github.rs:377  Window("GitHub'a gönder")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 horizontal, 2 düğme
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  depo-bolmesi/src/lisans.rs:99  Window("Lisans önizleme")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 1 horizontal, 1 düğme, alan() içinde [1 TextEdit]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  depo-bolmesi/src/lisans.rs:211  Window("Özel lisans")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 TextEdit, 1 düğme, alan() içinde [1 TextEdit]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kod-gezgin/src/lib.rs:123  Window("kod gezgini")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: ciz() içinde [1 ScrollArea, 1 düğme]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:158  Panel::top("gorunum")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: ayar_ciz() içinde [2 ComboBox, 3 düğme, 1 horizontal_wrapped, 3 seçim etiketi]
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  pencere-egui/src/app.rs:171  Panel::bottom("durum_cubugu")  -> Rol::DurumCubugu  [İŞARETSİZ]
+      içerik: durum_cubugu() içinde [yalnız çizim]
+      karar: dolgu çizgi tonu, küçük soluk yazı, tek satır
+  pencere-egui/src/app.rs:175  Window("📊 dil lejantı ve tablo")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: lejant_ciz() içinde [1 ScrollArea, 2 horizontal, 2 horizontal_wrapped]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:275  Panel::top("ust_serit")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: 1 horizontal_wrapped, 2 ComboBox, 3 düğme, ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  pencere-egui/src/app.rs:363  Panel::left("cekmece")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 1 kilim_tema yardımcısı, 2 TextEdit, 7 düğme, ciz() içinde [1 ScrollArea, 2 düğme, 1 horizontal], goster() içinde [yalnız çizim]
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  pencere-egui/src/app.rs:420  Window("YZ oturum izleri")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: izler_ciz() içinde [1 ScrollArea, 1 düğme]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:423  Window("sağlayıcı kotası")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: kota_ciz() içinde [2 düğme, 1 horizontal]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:426  Window("sağlayıcı / anahtar")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:436  Window("tüm depolar — toplu durum")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: ciz() içinde [1 Grid, 1 ScrollArea, 2 düğme, 1 horizontal, 1 kilim_tema yardımcısı]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  pencere-egui/src/app.rs:464  Panel::right("detay_panel")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: 1 kilim_tema yardımcısı, 2 düğme, ciz() içinde [yalnız çizim]
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  pencere-egui/src/app.rs:512  CentralPanel  -> Rol::Zemin  [İŞARETSİZ]
+      içerik: 1 ScrollArea, ciz() içinde [1 düğme]
+      karar: kâğıt görünümünde saydam (kâğıt görünür), sade görünümde zem
+  sohbet/src/konak.rs:130  Panel::right("sohbet_sutunu")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: 1 kilim_tema yardımcısı, ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  sohbet/src/oturum.rs:226  Panel::top  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: 1 horizontal, 1 TextEdit, 2 düğme
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  sohbet/src/oturum.rs:279  Panel::top  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+
+Öneri sayıları: COMBO=4, RENK=25, ROL=20, YATAY=1
+

@@ -96,11 +96,12 @@ impl TemaTercihi {
             Aydinlik::Koyu => ThemePreference::Dark,
         });
         crate::varyanti_kaydet(ctx, self.varyant);
+        crate::rol::gorunumu_kaydet(ctx, self.gorunum);
     }
 }
 
 fn dosya(uygulama: &str) -> Option<PathBuf> {
-    crate::paket::uygulama_dosyasi(uygulama, "txt")
+    kilim_palet::uygulama_dosyasi(uygulama, "txt")
 }
 
 /// "Tema" menüsü. Değişiklik olursa `uygula` çağrılmış olarak `true` döner (kaydetmek çağırana kalır).

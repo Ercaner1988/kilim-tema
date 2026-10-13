@@ -1,0 +1,19 @@
+=== ARAÇ: nazar (19 dosya) ===
+Giriş (run_native): src/main.rs
+Kurulum: giydir: YOK | sarma_kur: YOK | iki_temayi_kur: src/main.rs:153 | uygula: src/main.rs:156 | cerceve: YOK | tema_secici: src/arayuz.rs:818 | 
+Rol taşıyabilen bölge: 3 (işaretli 0, işaretsiz 3)
+Bulunan öğeler: CentralPanel=1, Frame=2, Grid=1, Panel::bottom=1, Panel::top=1, ScrollArea=3, TextEdit=3, düğme=6, dış çağrı=17, horizontal=8, horizontal_wrapped=1, kurulum çağrısı=3, renk sabiti=5, seçim etiketi=4, ui.visuals()=3
+
+Bölge ağacı (dosya sırasıyla):
+  src/arayuz.rs:159  Panel::top("ust")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: ust() içinde [1 Frame, 1 ScrollArea, 1 TextEdit, 1 düğme, 3 horizontal, 2 seçim etiketi]
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  src/arayuz.rs:163  Panel::bottom("alt")  -> Rol::DurumCubugu  [İŞARETSİZ]
+      içerik: alt() içinde [1 horizontal]
+      karar: dolgu çizgi tonu, küçük soluk yazı, tek satır
+  src/arayuz.rs:167  CentralPanel  -> Rol::Zemin  [İŞARETSİZ]
+      içerik: ayar_paneli() içinde [1 Grid, 1 ScrollArea, 1 TextEdit, 2 düğme, 4 horizontal], liste() içinde [1 ScrollArea, 1 düğme]
+      karar: kâğıt görünümünde saydam (kâğıt görünür), sade görünümde zem
+
+Öneri sayıları: IZGARA=1, ROL=3
+

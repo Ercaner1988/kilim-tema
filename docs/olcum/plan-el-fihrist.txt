@@ -1,0 +1,22 @@
+=== ARAÇ: el-fihrist (21 dosya) ===
+Giriş (run_native): fihrist-gui/src/lib.rs
+Kurulum: giydir: YOK | sarma_kur: YOK | iki_temayi_kur: YOK | uygula: YOK | cerceve: YOK | tema_secici: YOK | 
+Rol taşıyabilen bölge: 4 (işaretli 0, işaretsiz 4)
+Bulunan öğeler: CentralPanel=1, Panel::bottom=1, Panel::left=1, Panel::top=1, ScrollArea=2, TextEdit=1, düğme=2, horizontal=3, seçim etiketi=1
+
+Bölge ağacı (dosya sırasıyla):
+  fihrist-gui/src/app.rs:102  Panel::top("top_panel")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: 1 horizontal, 1 TextEdit, 2 düğme
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  fihrist-gui/src/app.rs:122  Panel::bottom("bottom_panel")  -> Rol::DurumCubugu  [İŞARETSİZ]
+      içerik: 1 horizontal
+      karar: dolgu çizgi tonu, küçük soluk yazı, tek satır
+  fihrist-gui/src/app.rs:132  Panel::left("left_panel")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 1 seçim etiketi
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  fihrist-gui/src/app.rs:159  CentralPanel  -> Rol::Zemin  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 1 horizontal
+      karar: kâğıt görünümünde saydam (kâğıt görünür), sade görünümde zem
+
+Öneri sayıları: ROL=4, YATAY=1
+

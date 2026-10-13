@@ -235,7 +235,8 @@ pub(crate) fn etkin_vurgu(koyu: bool) -> Option<Color32> {
         .map(|p| if koyu { p.vurgu_koyu } else { p.vurgu_acik })
 }
 
-pub(crate) fn uygulama_dosyasi(uygulama: &str, uzanti: &str) -> Option<PathBuf> {
+/// `<yapılandırma>/kilim-tema/<uygulama>.<uzantı>` (tema tercihi ve paket dosyaları için).
+pub fn uygulama_dosyasi(uygulama: &str, uzanti: &str) -> Option<PathBuf> {
     let kok = if cfg!(windows) {
         std::env::var_os("APPDATA").map(PathBuf::from)
     } else if cfg!(target_os = "macos") {

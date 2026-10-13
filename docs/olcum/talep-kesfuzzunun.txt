@@ -1,0 +1,80 @@
+=== İŞARETÇİ TALEPLERİ: kesfuzzunun ===
+
+-- araç düzeyi
+kesfuzzunun-gui/src/lib.rs:1609  [KURULUM] giriş `run_native` var, `kilim_tema::giydir` yok
+    gerekçe: giydir = iki_temayi_kur + sarma_kur + tercih.uygula + (KILIM_ROL_IZ=1 ise) rol bindirmesi; şu an eksik olanlar: iki_temayi_kur, sarma_kur
+    önce : Box::new(|cc| { .. kendi tema/sarma çağrıları .. })
+    sonra: Box::new(|cc| { let tercih = kilim_tema::TemaTercihi::yukle("<uygulama>", kilim_tema::TemaTercihi::varsayilan(kilim_tema::Varyant::CamGobegiAltin)); kilim_tema::giydir(&cc.egui_ctx, &tercih); .. })
+
+-- kesfuzzunun-gui-detay/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+kesfuzzunun-gui-detay/src/lib.rs:578  [RENK] sabit Basari rengi: Color32::from_rgb(0,160,90)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::from_rgb(0, 160, 90), boyut_bilgi);
+    sonra: ui.colored_label(kilim_tema::rol_rengi(ui, Rol::Basari), boyut_bilgi);
+kesfuzzunun-gui-detay/src/lib.rs:754  [RENK] sabit Uyari rengi: Color32::from_rgb(255,180,80)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : .color(Color32::from_rgb(255, 180, 80)),
+    sonra: .color(ui.visuals().warn_fg_color),
+
+-- kesfuzzunun-gui-diyalog/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer}; + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir))
+kesfuzzunun-gui-diyalog/src/lib.rs:239  [ROL] Window("🔍 Gelişmiş Arama") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+kesfuzzunun-gui-diyalog/src/lib.rs:514  [ROL] Window("📤 Kitaplığı / Öğeleri Dışa Aktar") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+kesfuzzunun-gui-diyalog/src/lib.rs:614  [RENK] sabit Basari rengi: Color32::from_rgb(0,160,90)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::from_rgb(0, 160, 90), msg);
+    sonra: ui.colored_label(kilim_tema::rol_rengi(ui, Rol::Basari), msg);
+kesfuzzunun-gui-diyalog/src/lib.rs:698  [ROL] Window("Zotero Tercihleri") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+
+-- kesfuzzunun-gui/src/lib.rs (kullanım: use kilim_tema::{Rol, RolVer};)
+kesfuzzunun-gui/src/lib.rs:805  [ROL] Window("Koleksiyona ekle") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+kesfuzzunun-gui/src/lib.rs:842  [ROL] Window("Yeni koleksiyon") -> Rol::Pencere
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ctx, |ui| {
+    sonra: .rol(Rol::Pencere).show(ctx, |ui| {
+kesfuzzunun-gui/src/lib.rs:1143  [ROL] Panel::top("ana_menu_cubugu") -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::UstCubuk).show(ui, |ui| {
+kesfuzzunun-gui/src/lib.rs:1148  [RENK] sabit Hata rengi: Color32::from_rgb(204,34,34)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : .color(Color32::from_rgb(204, 34, 34)),
+    sonra: .color(ui.visuals().error_fg_color),
+kesfuzzunun-gui/src/lib.rs:1235  [ROL] Panel::top("arac_cubugu") -> Rol::UstCubuk
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::UstCubuk).show(ui, |ui| {
+kesfuzzunun-gui/src/lib.rs:1322  [ROL] Panel::bottom("durum_cubugu") -> Rol::DurumCubugu
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::DurumCubugu).show(ui, |ui| {
+kesfuzzunun-gui/src/lib.rs:1338  [RENK] sabit Basari rengi: Color32::from_rgb(0,180,80)
+    gerekçe: sabit renk açık/koyu temayı ve paketi izlemez; anlamsal renk palette bağlıdır
+    önce : ui.colored_label(Color32::from_rgb(0, 180, 80), mesaj);
+    sonra: ui.colored_label(kilim_tema::rol_rengi(ui, Rol::Basari), mesaj);
+kesfuzzunun-gui/src/lib.rs:1353  [ROL] Panel::left("sol_koleksiyon_paneli") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::YanPanel).show(ui, |ui| {
+kesfuzzunun-gui/src/lib.rs:1394  [ROL] Panel::right("sag_detay_paneli") -> Rol::YanPanel
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : .show(ui, |ui| {
+    sonra: .rol(Rol::YanPanel).show(ui, |ui| {
+kesfuzzunun-gui/src/lib.rs:1439  [ROL] CentralPanel -> Rol::Zemin
+    gerekçe: çerçeve/yerleşim kararı rolden gelir; işaretsiz bölgeyi çalışma zamanı da bulamaz
+    önce : egui::CentralPanel::default().show(ui, |ui| {
+    sonra: egui::CentralPanel::default().rol(Rol::Zemin).show(ui, |ui| {
+
+Toplam talep: 17
+

@@ -1,0 +1,43 @@
+=== ARAÇ: kesfuzzunun (155 dosya) ===
+Giriş (run_native): kesfuzzunun-gui/src/lib.rs
+Kurulum: giydir: YOK | sarma_kur: YOK | iki_temayi_kur: YOK | uygula: kesfuzzunun-gui/src/lib.rs:1058 | cerceve: YOK | tema_secici: YOK | 
+Rol taşıyabilen bölge: 11 (işaretli 0, işaretsiz 11)
+Bulunan öğeler: CentralPanel=1, ComboBox=5, Panel::bottom=1, Panel::left=1, Panel::right=1, Panel::top=2, ScrollArea=7, TextEdit=9, Window=5, düğme=59, dış çağrı=21, horizontal=27, horizontal_wrapped=2, kilim_tema yardımcısı=2, kurulum çağrısı=1, renk sabiti=25, seçim etiketi=16, ui.visuals()=3
+
+Bölge ağacı (dosya sırasıyla):
+  kesfuzzunun-gui-diyalog/src/lib.rs:235  Window("🔍 Gelişmiş Arama")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 5 horizontal, 2 ComboBox, 2 TextEdit, 5 düğme
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kesfuzzunun-gui-diyalog/src/lib.rs:510  Window("📤 Kitaplığı / Öğeleri Dışa Aktar")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 3 horizontal, 1 ComboBox, 1 TextEdit, 2 düğme
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kesfuzzunun-gui-diyalog/src/lib.rs:694  Window("Zotero Tercihleri")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 2 horizontal, 1 ComboBox, 1 düğme, 1 seçim etiketi
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kesfuzzunun-gui/src/lib.rs:802  Window("Koleksiyona ekle")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 ScrollArea, 1 düğme
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kesfuzzunun-gui/src/lib.rs:839  Window("Yeni koleksiyon")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: 1 TextEdit, 1 düğme
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  kesfuzzunun-gui/src/lib.rs:1141  Panel::top("ana_menu_cubugu")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: 1 horizontal, 9 düğme
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  kesfuzzunun-gui/src/lib.rs:1233  Panel::top("arac_cubugu")  -> Rol::UstCubuk  [İŞARETSİZ]
+      içerik: 1 horizontal, 1 ComboBox, 1 TextEdit, 5 düğme
+      karar: dolgu yuzey, alt çizgi, dar iç boşluk, düğme/giriş sıkı aralık
+  kesfuzzunun-gui/src/lib.rs:1320  Panel::bottom("durum_cubugu")  -> Rol::DurumCubugu  [İŞARETSİZ]
+      içerik: 1 horizontal
+      karar: dolgu çizgi tonu, küçük soluk yazı, tek satır
+  kesfuzzunun-gui/src/lib.rs:1349  Panel::left("sol_koleksiyon_paneli")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  kesfuzzunun-gui/src/lib.rs:1388  Panel::right("sag_detay_paneli")  -> Rol::YanPanel  [İŞARETSİZ]
+      içerik: ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: dolgu yuzey, kenar çizgisi, içerik sabit_genislik'te (şişme/daralma yok), sarma açık
+  kesfuzzunun-gui/src/lib.rs:1439  CentralPanel  -> Rol::Zemin  [İŞARETSİZ]
+      içerik: ciz() (tanımı bu araçta yok ya da birden çok)
+      karar: kâğıt görünümünde saydam (kâğıt görünür), sade görünümde zem
+
+Öneri sayıları: RENK=5, ROL=11
+

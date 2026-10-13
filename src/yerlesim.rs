@@ -14,16 +14,21 @@
 //!    sarılır ve kenarda kesilir. Sabit genişlikli denetim (metin kutusu 280 px, ComboBox) yan yana
 //!    dizilecekse `horizontal_wrapped` + kendi içinde kap açanlar için [`birim`].
 
-use egui::{pos2, vec2, Align, Context, Layout, Rect, TextWrapMode, Ui, UiBuilder};
+use egui::{pos2, vec2, Align, Context, Layout, Rect, TextWrapMode, Ui, UiBuilder, UiStackInfo};
 
 /// Uygulama açılışında bir kez: her metin (yatay satırda da) kullanılabilir genişlikte sarılır.
 /// Taşan öğeyi bulmak için: hata ayıklama yapısını `KILIM_TASMA_IZ=1` ile başlat; ebeveynini genişleten
 /// her öğe kırmızı boyanır (egui `show_expand_width`).
 pub fn sarma_kur(ctx: &Context) {
-    let iz = cfg!(debug_assertions) && std::env::var_os("KILIM_TASMA_IZ").is_some();
+    // `Style::debug` yalnız hata ayıklama yapısında vardır (egui 0.36); yayın derlemesi alanı görmez.
+    #[cfg(debug_assertions)]
+    let iz = std::env::var_os("KILIM_TASMA_IZ").is_some();
     ctx.all_styles_mut(|s| {
         s.wrap_mode = Some(TextWrapMode::Wrap);
-        s.debug.show_expand_width |= iz;
+        #[cfg(debug_assertions)]
+        {
+            s.debug.show_expand_width |= iz;
+        }
     });
 }
 
@@ -31,9 +36,19 @@ pub fn sarma_kur(ctx: &Context) {
 /// panelin genişliğini içerik değil yalnız kullanıcının sürüklemesi belirler (şişme, daralma, sıçrama yok).
 /// Sarılamayan bir öğe yine de taşarsa kırpılır (bulmak için `KILIM_TASMA_IZ=1`, bkz. [`sarma_kur`]).
 pub fn sabit_genislik<R>(ui: &mut Ui, icerik: impl FnOnce(&mut Ui) -> R) -> R {
+    sabit_genislik_bilgili(ui, UiStackInfo::default(), icerik)
+}
+
+/// [`sabit_genislik`], çocuk `Ui`'nin `UiStack` bilgisiyle (rol etiketi için, bkz. `bolge`).
+pub(crate) fn sabit_genislik_bilgili<R>(
+    ui: &mut Ui,
+    bilgi: UiStackInfo,
+    icerik: impl FnOnce(&mut Ui) -> R,
+) -> R {
     let alan = ui.available_rect_before_wrap();
     let mut cocuk = ui.new_child(
         UiBuilder::new()
+            .ui_stack_info(bilgi)
             .id_salt("sabit_genislik")
             .max_rect(alan)
             .layout(*ui.layout()),

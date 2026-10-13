@@ -1,0 +1,16 @@
+=== ARAÇ: kunye (48 dosya) ===
+Giriş (run_native): yok (kitaplık)
+Kurulum: giydir: YOK | sarma_kur: YOK | iki_temayi_kur: YOK | uygula: YOK | cerceve: YOK | tema_secici: YOK | 
+Rol taşıyabilen bölge: 2 (işaretli 0, işaretsiz 2)
+Bulunan öğeler: ComboBox=5, Frame=5, Grid=1, Panel::bottom=1, ScrollArea=6, TextEdit=6, Window=1, düğme=20, dış çağrı=91, horizontal=16, horizontal_wrapped=8, kilim_tema yardımcısı=3, renk sabiti=1, seçim etiketi=6, ui.visuals()=18
+
+Bölge ağacı (dosya sırasıyla):
+  sohbet-egui/src/istem_pencere.rs:21  Window("Hazır istemleri düzenle")  -> Rol::Pencere  [İŞARETSİZ]
+      içerik: render_form() içinde [2 TextEdit, 1 horizontal], render_liste() içinde [1 horizontal], render_sifirla() içinde [1 horizontal]
+      karar: dolgu yuzey, belirgin çizgi, gölge, yuvarlak köşe
+  sohbet-egui/src/lib.rs:47  Panel::bottom  -> Rol::DurumCubugu  [İŞARETSİZ]
+      içerik: render_alt() içinde [yalnız çizim]
+      karar: dolgu çizgi tonu, küçük soluk yazı, tek satır
+
+Öneri sayıları: IZGARA=1, ROL=2
+
