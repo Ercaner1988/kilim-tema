@@ -211,6 +211,16 @@ pub fn kenarlik_ciz(painter: &Painter, rect: Rect, varyant: Varyant, t: f32) {
 /// Uygulamanın kök `Ui`'sini tercihe göre sarar. Kilim: kâğıt + kenarlık, içerik (paneller
 /// dahil) kenarlığın içinde saydam panel zeminiyle. Sade: yalnız uygulamanın düz zemini.
 pub fn cerceve<R>(ui: &mut Ui, tercih: &TemaTercihi, icerik: impl FnOnce(&mut Ui) -> R) -> R {
+    cerceve_kalinlikli(ui, tercih, KALINLIK, icerik)
+}
+
+/// [`cerceve`] ile aynı, kenarlık kalınlığı (px) verilir: küçük pencere ince kenarlık ister.
+pub fn cerceve_kalinlikli<R>(
+    ui: &mut Ui,
+    tercih: &TemaTercihi,
+    kalinlik: f32,
+    icerik: impl FnOnce(&mut Ui) -> R,
+) -> R {
     let rect = ui.max_rect();
     if tercih.gorunum == Gorunum::Sade {
         ui.painter().rect_filled(rect, 0.0, ui.visuals().panel_fill);
@@ -224,8 +234,8 @@ pub fn cerceve<R>(ui: &mut Ui, tercih: &TemaTercihi, icerik: impl FnOnce(&mut Ui
         Color32::WHITE
     };
     kagit_ciz(ui.painter(), rect, ton);
-    kenarlik_ciz(ui.painter(), rect, varyant, KALINLIK);
-    ui.scope_builder(UiBuilder::new().max_rect(rect.shrink(KALINLIK)), |ui| {
+    kenarlik_ciz(ui.painter(), rect, varyant, kalinlik);
+    ui.scope_builder(UiBuilder::new().max_rect(rect.shrink(kalinlik)), |ui| {
         ui.visuals_mut().panel_fill = Color32::TRANSPARENT;
         icerik(ui)
     })
