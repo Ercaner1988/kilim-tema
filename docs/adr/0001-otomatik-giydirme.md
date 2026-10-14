@@ -222,10 +222,11 @@ tarayıcıya `--uygula` (yama üretimi); `syn` yalnız alıcı türü gerekirse;
 
 ## 11. Açık sorular (Ercan)
 
-Yanıtlananlar (2026-10-13/14): 2 → evet, tüm araçlara yansısın; 3 → evet, kunye kitaplıkları da `.rol` kullanır (konak kurulumu yine `giydir`); kilim bağımlılığı her yerde git rev (pasli dahil, yol bağımlılığı yok). Nazar'ın küçük penceresi için istenen ince kenarlık `cerceve_kalinlikli` ile karşılandı (d4f3504). Açık kalanlar: 1, 4, 5.
+Yanıtlananlar (2026-10-13/14): 2 → evet, tüm araçlara yansısın; 3 → evet, kunye kitaplıkları da `.rol` kullanır (konak kurulumu yine `giydir`); kilim bağımlılığı her yerde git rev (pasli dahil, yol bağımlılığı yok). Nazar'ın küçük penceresi için istenen ince kenarlık `cerceve_kalinlikli` ile karşılandı (d4f3504). 2026-10-14: 1 → evet, `kilim-palet` ayrımı kalır; 4 → alan alan birleştirme (aşağıda, uygulanacak); 5 → evet, `kapi.toml` açılır (kunye beyanı örnek; ilk koşunun kırmızıları aynı işte giderilir, muafiyet gerekçeli). Açık soru kalmadı.
 
 1. Sandık ayrımı: kilim-tema 1690 kod satırına çıkacaktı (sınır 1500); renk çekirdeği `kilim-palet`e ayrıldı, kilim-tema API'si aynı (yeniden dışa aktarım). Uygun mu?
 2. Katman 0 görünüm değişikliği (hata/uyarı rengi paletten, metin kutusu zemini, şeritli satır dolgusu) pasli/kesf/nazar'a rev yükseltince hemen yansır: kabul mü?
 3. kunye kitaplıklarına `.rol` konsun mu (bağımlılık) yoksa yalnız konak uygulamaları mı işaretlesin?
 4. `Frame` semantiği: `Frame::new().fill(x).rol(Rol::Kart)` rol çerçevesini kullanır, aracın `fill`'ini yok sayar (egui `Frame` alanları sorgulanamaz); renkli özel çerçeveler için tarayıcı Kart önermez.
+   **Karar (2026-10-14): alan alan birleştirme.** "Sorgulanamaz" yanlıştı: egui 0.36 `Frame` alanları `pub`. Aracın açıkça verdiği alan kazanır (`fill` saydam değilse, `stroke` boş değilse, `inner_margin`/`outer_margin`/`corner_radius`/`shadow` varsayılan değilse), verilmeyen alan rol çerçevesinden gelir. `Rolu<Frame>::show` bugün `self.kap`'ı atıyor (sessiz kayıp); düzeltme + sınama ayrı iş, sonra tarayıcı renkli çerçevelere de Kart önerebilir.
 5. `kilim-tema` için `kapi.toml` açılsın mı (şu an `kapi . --guvenilen-kod` çalışmaz: beyan yok)?
