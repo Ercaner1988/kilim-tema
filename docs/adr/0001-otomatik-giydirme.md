@@ -222,6 +222,8 @@ tarayıcıya `--uygula` (yama üretimi); `syn` yalnız alıcı türü gerekirse;
 
 ## 11. Açık sorular (Ercan)
 
+Yanıtlananlar (2026-10-13/14): 2 → evet, tüm araçlara yansısın; 3 → evet, kunye kitaplıkları da `.rol` kullanır (konak kurulumu yine `giydir`); kilim bağımlılığı her yerde git rev (pasli dahil, yol bağımlılığı yok). Nazar'ın küçük penceresi için istenen ince kenarlık `cerceve_kalinlikli` ile karşılandı (d4f3504). Açık kalanlar: 1, 4, 5.
+
 1. Sandık ayrımı: kilim-tema 1690 kod satırına çıkacaktı (sınır 1500); renk çekirdeği `kilim-palet`e ayrıldı, kilim-tema API'si aynı (yeniden dışa aktarım). Uygun mu?
 2. Katman 0 görünüm değişikliği (hata/uyarı rengi paletten, metin kutusu zemini, şeritli satır dolgusu) pasli/kesf/nazar'a rev yükseltince hemen yansır: kabul mü?
 3. kunye kitaplıklarına `.rol` konsun mu (bağımlılık) yoksa yalnız konak uygulamaları mı işaretlesin?
