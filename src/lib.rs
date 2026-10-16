@@ -15,6 +15,7 @@
 mod bolge;
 mod doku;
 mod dugme;
+mod pencere;
 mod rol;
 mod tercih;
 mod yerlesim;
@@ -24,6 +25,7 @@ pub use bolge::{
 };
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
+pub use pencere::{pencere_dugmesi, PencereDugmesi};
 // Renk çekirdeği ayrı sandıkta (sandık sınırı); API aynı kalır.
 pub use kilim_palet::{
     acik, etkin_paket, etkin_paketi_kaydet, etkin_paketi_sil, etkin_paketi_yukle, gecis_uygula,
@@ -245,7 +247,17 @@ pub fn cerceve_kalinlikli<R>(
 /// Boncuk düğme: `cap` çaplı, üstüne `simge` (ör. egui-phosphor glifi) çizilir.
 /// Üzerinde: hafif büyür; basılı: 1 px çöker ve kararır; pasif: soluk.
 pub fn boncuk_dugme(ui: &mut Ui, boncuk: Boncuk, simge: &str, cap: f32) -> Response {
-    let (rect, cevap) = ui.allocate_exact_size(vec2(cap, cap), Sense::click());
+    boncuk_dugme_duyulu(ui, boncuk, simge, cap, Sense::click())
+}
+
+pub(crate) fn boncuk_dugme_duyulu(
+    ui: &mut Ui,
+    boncuk: Boncuk,
+    simge: &str,
+    cap: f32,
+    duyu: Sense,
+) -> Response {
+    let (rect, cevap) = ui.allocate_exact_size(vec2(cap, cap), duyu);
     if ui.is_rect_visible(rect) {
         let d = dokular(ui.ctx());
         let ustunde = ui.ctx().animate_bool(cevap.id, cevap.hovered());
