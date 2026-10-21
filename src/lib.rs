@@ -15,6 +15,7 @@
 mod bolge;
 mod doku;
 mod dugme;
+mod islev;
 mod pencere;
 mod rol;
 mod tercih;
@@ -25,6 +26,7 @@ pub use bolge::{
 };
 pub use doku::{dokular, Dokular, Kenarlik};
 pub use dugme::{anahtar_ciz, boncuk_resmi, boncuklu, isaret_ciz, kutu, secim};
+pub use islev::{islev, islev_kayitlari, IslevKaydi, IslevTanimi, TemaBetigi};
 pub use pencere::{pencere_dugmesi, PencereDugmesi};
 // Renk çekirdeği ayrı sandıkta (sandık sınırı); API aynı kalır.
 pub use kilim_palet::{

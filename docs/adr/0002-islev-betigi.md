@@ -1,0 +1,13 @@
+# 0002 — Semantik işlev betiği
+
+Durum: uygulandı. ADR 0001'in Git rev bağımlılık politikası sürer.
+
+`TemaBetigi::coz` şema 1 JSON'unu doğrular, `kur(&Context)` yalnız başarılı betiği o bağlama kurar. Kaynak dosya çalıştırılmaz. En fazla 256 KiB ve 512 kural kabul edilir. Bilinmeyen alan/rol/doku, yanlış renk ve boş kural listesi hatadır; eski kurulum korunur. `examples/tema-betigi.json` başlangıç örneğidir.
+
+`islev(ui, IslevTanimi { id, rol, komut }, |ui| ui.button("Ara"))` önce rolün stilini, sonra eşleşen kuralları çizimden önce yalnız kapsam içine uygular. `rol` zorunlu, `id` ve `komut` isteğe bağlı tam eşleşme seçicileridir. Sıralı kurallar alanları ezer. Normal baz; hover, pressed ve disabled durum ezmeleridir. Egui'nin pasif görünümü `noninteractive` alanıdır. `focus` yalnız `cizgi` kabul eder ve gerçek odaklanan Response çevresine çizilir. Metin/dolgu odak alanları açık hata verir. Egui'nin kendi pasif alfa harmanlaması sürer.
+
+Renkler `#RRGGBB` veya `#RRGGBBAA` biçimindedir. Yeni dolguya metin belirtilmemişse paletin `okunur_metin` yordamı uygulanır. Açıkça verilen metin aynen uygulanır; kontrast garantisi verilmez. Doku `kagit` ya da `boncuk:firuze/akik/kehribar/lapis/telkari/sirma/nazar/tesbih/sedef` olabilir. Doku gerçek painter shape olarak Response.rect arkasında çizilir; widget'ın tema dolgusu saydamlaştırılır. Açıkça fill/text_color kuran özel widget'lar kapsam stilini ezebilir; tüketici standart Button/Label kullanmalıdır.
+
+`selected` seçili standart widget'larda `visuals.selection` üzerinden uygulanır. Egui seçim metni ve çizgisi aynı stroke'u kullandığından `selected.cizgi`, birlikte verilirse `selected.metin` rengini ezer. Seçili öğenin kendi opak seçim dolgusu dokuyu örtebilir. `Giris` normal/pasif dolgusu `text_edit_bg_color` üzerinden gerçek TextEdit zeminine uygulanır. Yüzey rolleri (Zemin/Yuzey/paneller/Kart/Pencere/Acilir) doku olmadan da arka RectShape çizer: örneğin `islev(ui, tanim, |ui| ui.scope(|ui| { ui.label("Kart"); }).response)`. İçerik kendi opak Frame/Panel dolgusu çizmemelidir. TextEdit'in özel hover/pressed dolgu geçişi yoktur; egui'nin standart etkileşim çizgileri sürer.
+
+`islev_kayitlari` semantik kimlik, rol, komut, gerçek Response.id/rect ve etkileşim durumlarını döndürür. Komut dispatch uygulamaya aittir; wrapper aynı Response'u döndürür. Semantik id liste satırlarında paylaşılabilir: farklı Response.id ayrı kayıt; aynı semantik id + Response.id güncellenir. İç içe wrapper dıştaki sonucu değiştirmez. Defter her çizim geçişinin başında temizlenir, Context'ler izoledir. `giydir`, eski rol defteri ve varsayılan tema değişmez.

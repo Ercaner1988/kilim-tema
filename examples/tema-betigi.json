@@ -1,0 +1,14 @@
+{
+  "sema": 1,
+  "kurallar": [
+    {
+      "rol": "DugmeBirincil",
+      "normal": { "dolgu": "#203040", "metin": "#ffffff", "cizgi": "#90abcd" },
+      "hover": { "dolgu": "#405060" },
+      "pressed": { "dolgu": "#102030" },
+      "disabled": { "dolgu": "#555555" },
+      "focus": { "cizgi": "#ffffff" },
+      "doku": "kagit"
+    }
+  ]
+}

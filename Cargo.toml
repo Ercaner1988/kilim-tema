@@ -12,6 +12,8 @@ members = [".", "isle", "tarama", "palet"]
 egui = "0.36"
 kilim-palet = { path = "palet" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 
 [dev-dependencies]
 egui_kittest = { version = "0.36", features = ["wgpu"] }
