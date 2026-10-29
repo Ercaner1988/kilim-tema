@@ -61,17 +61,20 @@ fn boya(
 }
 
 /// Bant: doluluğu > %80 olan ardışık satır/sütunlar → (dış baş, iç baş, iç son, dış son).
-fn bant_kenarlari(doluluk: &[f32]) -> (u32, u32, u32, u32) {
+fn bant_kenarlari(doluluk: &[f32]) -> Option<(u32, u32, u32, u32)> {
     let tam: Vec<bool> = doluluk.iter().map(|d| *d > 0.8).collect();
-    let bas = tam.iter().position(|t| *t).expect("bant yok");
-    let son = tam.iter().rposition(|t| *t).unwrap();
+    let bas = tam.iter().position(|t| *t)?;
+    let son = tam.iter().rposition(|t| *t)?;
     let ic_bas = bas + tam[bas..].iter().position(|t| !t).unwrap_or(0);
     let ic_son = (0..=son).rev().find(|k| !tam[*k]).map_or(son, |k| k + 1);
-    (bas as u32, ic_bas as u32, ic_son as u32, son as u32 + 1)
+    Some((bas as u32, ic_bas as u32, ic_son as u32, son as u32 + 1))
 }
 
-fn koseler(cer: &Rgb32FImage) -> ([Rgb32FImage; 4], (u32, u32)) {
+fn koseler(cer: &Rgb32FImage) -> Sonuc<([Rgb32FImage; 4], (u32, u32))> {
     let (w, h) = cer.dimensions();
+    if w <= 5 || h <= 5 {
+        return Err("çerçeve görseli çok küçük; en az 6x6 piksel olmalı".into());
+    }
     let arka = *cer.get_pixel(5, 5);
     let dolu = |x, y| {
         let p = cer.get_pixel(x, y);
@@ -83,11 +86,11 @@ fn koseler(cer: &Rgb32FImage) -> ([Rgb32FImage; 4], (u32, u32)) {
     let satir: Vec<f32> = (0..h)
         .map(|y| (0..w).filter(|x| dolu(*x, y)).count() as f32 / w as f32)
         .collect();
-    let (x0, x1, x2, x3) = bant_kenarlari(&sutun);
-    let (y0, y1, y2, y3) = bant_kenarlari(&satir);
+    let (x0, x1, x2, x3) = bant_kenarlari(&sutun).ok_or("çerçevede dikey bant bulunamadı")?;
+    let (y0, y1, y2, y3) = bant_kenarlari(&satir).ok_or("çerçevede yatay bant bulunamadı")?;
     let k = |x: u32, y: u32, xs: u32, ys: u32| kirp(cer, x, y, xs - x, ys - y);
     // sıra: sol-üst, sağ-üst, sağ-alt, sol-alt (kilim-tema Kenarlik.koseler ile aynı)
-    (
+    Ok((
         [
             k(x0, y0, x1, y1),
             k(x2, y0, x3, y1),
@@ -95,7 +98,7 @@ fn koseler(cer: &Rgb32FImage) -> ([Rgb32FImage; 4], (u32, u32)) {
             k(x0, y2, x1, y3),
         ],
         (x1 - x0, y1 - y0),
-    )
+    ))
 }
 
 const KOSE_ADLARI: [&str; 4] = [
@@ -112,9 +115,12 @@ pub fn kilim(
     cerceve_b: &str,
     cikti: &Path,
     kalinlik: u32,
-) {
-    let serit = yukle(kaynak, serit_b);
+) -> Sonuc<()> {
+    let serit = yukle(kaynak, serit_b)?;
     let (w, h) = serit.dimensions();
+    if w < 8 || h == 0 {
+        return Err("kenarlık şeridi çok küçük".into());
+    }
     let arka = *serit.get_pixel(5, 5);
     let bantli: Vec<u32> = (0..h)
         .filter(|y| {
@@ -128,10 +134,18 @@ pub fn kilim(
             dolu as f32 / w as f32 > 0.5
         })
         .collect();
-    let (y0, y1) = (bantli[0], *bantli.last().unwrap() + 1);
+    let y0 = *bantli.first().ok_or("kenarlık şeridinde bant bulunamadı")?;
+    let y1 = bantli
+        .last()
+        .copied()
+        .ok_or("kenarlık şeridinde bant bulunamadı")?
+        + 1;
     let p = w / 4;
     // ortadaki birim: görsel kenarındaki bozukluk yok
     let birim_b = kirp(&serit, p, y0, p, y1 - y0);
+    if birim_b.width() < 2 || birim_b.height() == 0 {
+        return Err("kenarlık birim ölçüsü geçersiz".into());
+    }
     let komsu = (0..birim_b.height())
         .flat_map(|y| (0..birim_b.width() - 1).map(move |x| (x, y)))
         .map(|(x, y)| {
@@ -150,8 +164,8 @@ pub fn kilim(
     let dikis_orani = sinir / komsu;
     let (zemin_b, motif_b) = sinif_ortalamalari(birim_b.pixels(), yesil_mi);
 
-    let (kos_a, kal_a) = koseler(&yukle(kaynak, cerceve_a));
-    let (kos_b, kal_b) = koseler(&yukle(kaynak, cerceve_b));
+    let (kos_a, kal_a) = koseler(&yukle(kaynak, cerceve_a)?)?;
+    let (kos_b, kal_b) = koseler(&yukle(kaynak, cerceve_b)?)?;
     let (zemin_a, motif_a) = sinif_ortalamalari(kos_a.iter().flat_map(|k| k.pixels()), altin_mi);
 
     let uzun = (birim_b.width() as f32 * kalinlik as f32 / birim_b.height() as f32).round() as u32;
@@ -168,12 +182,12 @@ pub fn kilim(
         kaydet(
             &kucult(kenar, uzun, kalinlik),
             &cikti.join(ad).join("kenar.png"),
-        );
+        )?;
         for (k, dosya) in kos.iter().zip(KOSE_ADLARI) {
             kaydet(
                 &kucult(k, kalinlik, kalinlik),
                 &cikti.join(ad).join(format!("{dosya}.png")),
-            );
+            )?;
         }
     }
     println!(
@@ -188,7 +202,10 @@ pub fn kilim(
         hex(zemin_b),
         hex(motif_b)
     );
-    assert!(dikis_orani < 1.5, "şerit birimi dikişsiz birleşmiyor");
+    if !dikis_orani.is_finite() || dikis_orani >= 1.5 {
+        return Err(format!("şerit birimi dikişsiz birleşmiyor: oran {dikis_orani:.2}").into());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -199,6 +216,11 @@ mod sinama {
     fn bant_dis_ve_ic_kenarlari() {
         // dış boşluk, 3 dolu satır (bant), iç boşluk, 2 dolu satır, dış boşluk
         let d = [0.0, 1.0, 1.0, 1.0, 0.3, 0.3, 1.0, 1.0, 0.0];
-        assert_eq!(bant_kenarlari(&d), (1, 4, 6, 8));
+        assert_eq!(bant_kenarlari(&d), Some((1, 4, 6, 8)));
+    }
+
+    #[test]
+    fn bant_yoksa_hata_paniklemez() {
+        assert_eq!(bant_kenarlari(&[0.0, 0.2, 0.8]), None);
     }
 }

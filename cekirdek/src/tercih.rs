@@ -80,12 +80,25 @@ impl TemaTercihi {
             .map_or(varsayilan, |m| Self::coz(&m, varsayilan))
     }
 
-    /// Kaydedemezse sessizce geçer: tercih yalnız kolaylıktır, uygulama çalışmaya devam eder.
+    /// Kaydedemezse hatayı stderr'e yazar; eski imza uyumluluk için korunur.
     pub fn kaydet(&self, uygulama: &str) {
-        if let Some(d) = dosya(uygulama) {
-            let _ = d.parent().map(std::fs::create_dir_all);
-            let _ = std::fs::write(d, self.kod());
+        if let Err(hata) = self.kaydet_sonuc(uygulama) {
+            eprintln!("kilim-tema: tercih kaydedilemedi: {hata}");
         }
+    }
+
+    /// Tercihi yapılandırma dosyasına yazar; dosya sistemi hatalarını çağırana döndürür.
+    pub fn kaydet_sonuc(&self, uygulama: &str) -> std::io::Result<()> {
+        let d = dosya(uygulama).ok_or_else(|| {
+            std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "yapılandırma dizini bulunamadı",
+            )
+        })?;
+        if let Some(ust) = d.parent() {
+            std::fs::create_dir_all(ust)?;
+        }
+        std::fs::write(d, self.kod())
     }
 
     /// Açık/koyu tercihini egui'ye bildirir; uygulamaların paleti `ctx.theme()`'i izler.

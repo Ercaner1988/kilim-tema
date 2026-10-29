@@ -6,15 +6,23 @@ license = "MIT"
 description = "Ortak egui teması: Kilim paleti, Semerkant kâğıdı zemini, Yörük kilimi kenarlık, boncuk düğmeler"
 
 [workspace]
-members = [".", "isle", "tarama", "palet"]
+members = [".", "isle", "tarama", "palet", "cekirdek", "betik"]
 
 [dependencies]
-egui = "0.36"
-kilim-palet = { path = "palet" }
-image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+egui = "0.37"
+kilim-cekirdek = { path = "cekirdek" }
+kilim-betik = { path = "betik" }
 
 [dev-dependencies]
-egui_kittest = { version = "0.36", features = ["wgpu"] }
-eframe = { version = "0.36", features = ["wgpu"] }
+egui_kittest = { version = "0.37", features = ["wgpu"] }
+eframe = { version = "0.37", features = ["wgpu"] }
+
+# Keep the wgpu v30 surface-id leak fix aligned with the application workspace.
+[patch.crates-io]
+wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+wgpu-core = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+naga = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+naga-types = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+wgpu-hal = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+wgpu-types = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }
+wgpu-naga-bridge = { git = "https://github.com/gfx-rs/wgpu", rev = "2508e37" }

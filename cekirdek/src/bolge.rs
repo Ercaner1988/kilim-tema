@@ -208,7 +208,7 @@ fn kaydet(ui: &Ui, rol: Rol, s: &RolStili) {
     let ctx = ui.ctx();
     let pass = ctx.cumulative_pass_nr(); // `data_mut` içinde bağlam kilitli: dışarıda okunur
     ctx.data_mut(|d| {
-        let df = d.get_temp_mut_or_default::<Defter>(Id::new(DEFTER));
+        let df = d.get_temp_mut_or_default::<Defter>(Id::unique(DEFTER));
         if df.pass != pass {
             df.pass = pass;
             df.kayitlar.clear();
@@ -219,7 +219,7 @@ fn kaydet(ui: &Ui, rol: Rol, s: &RolStili) {
 
 /// Son çizilen karede işaretlenmiş bölgeler (çizim sırasıyla).
 pub fn rol_kayitlari(ctx: &Context) -> Vec<Kayit> {
-    ctx.data(|d| d.get_temp::<Defter>(Id::new(DEFTER)))
+    ctx.data(|d| d.get_temp::<Defter>(Id::unique(DEFTER)))
         .map(|d| d.kayitlar)
         .unwrap_or_default()
 }
@@ -267,7 +267,7 @@ impl egui::Plugin for RolIzi {
         let ctx = ui.ctx().clone();
         let boyaci = ctx.layer_painter(egui::LayerId::new(
             egui::Order::Debug,
-            Id::new("kilim-rol-izi"),
+            Id::unique("kilim-rol-izi"),
         ));
         for k in rol_kayitlari(&ctx) {
             let renk = if k.uyumlu {

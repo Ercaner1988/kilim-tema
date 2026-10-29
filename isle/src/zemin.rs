@@ -112,8 +112,11 @@ fn noktalari_sil(g: &mut Rgb32FImage) -> usize {
     maske.iter().filter(|m| **m).count()
 }
 
-pub fn kagit(kaynak: &Path, ad: &str, cikti: &Path) {
-    let ham = yukle(kaynak, ad);
+pub fn kagit(kaynak: &Path, ad: &str, cikti: &Path) -> Sonuc<()> {
+    let ham = yukle(kaynak, ad)?;
+    if ham.width() < 4 || ham.height() < 4 {
+        return Err("kâğıt görseli en az 4x4 piksel olmalı".into());
+    }
     let mut k = kirp(&ham, 0, 0, birim(&ham, true), birim(&ham, false));
     for yatay in [false, true] {
         if kenar_dikisi(&k, yatay) > 1.4 {
@@ -127,7 +130,7 @@ pub fn kagit(kaynak: &Path, ad: &str, cikti: &Path) {
             p[c] = (p[c] * ZEM[c] / ort[c]).clamp(0.0, 1.0);
         }
     }
-    kaydet_jpeg(&k, &cikti.join("kagit-karo.jpg"), 90);
+    kaydet_jpeg(&k, &cikti.join("kagit-karo.jpg"), 90)?;
     let dk = (kenar_dikisi(&k, false), kenar_dikisi(&k, true));
     println!(
         "kâğıt: birim {}x{}, dikiş üst-alt {:.2} sol-sağ {:.2} (≈1 dikişsiz), silinen nokta pikseli {silinen}, ortalama {}",
@@ -137,14 +140,20 @@ pub fn kagit(kaynak: &Path, ad: &str, cikti: &Path) {
         dk.1,
         hex(ortalama(k.pixels()))
     );
-    assert!(dk.0.max(dk.1) < 1.4, "karo dikişi görünür");
+    if dk.0.max(dk.1) >= 1.4 {
+        return Err(format!("karo dikişi görünür: {:.2}/{:.2}", dk.0, dk.1).into());
+    }
+    Ok(())
 }
 
 /// egui'de çarpma kipi yok, yalnız alfa "üstüne" var. zem üstünde çarpmayla birebir aynı
 /// sonucu veren örtü: a = 1 - min(s), C = zem*(s - min s)/a. Lifli yerlerde yaklaşık.
-pub fn leke(kaynak: &Path, ad: &str, cikti: &Path, opaklik: f32) {
-    let mut s = yukle(kaynak, ad);
+pub fn leke(kaynak: &Path, ad: &str, cikti: &Path, opaklik: f32) -> Sonuc<()> {
+    let mut s = yukle(kaynak, ad)?;
     let (w, h) = s.dimensions();
+    if w < 3 || h < 3 {
+        return Err("leke görseli en az 3x3 piksel olmalı".into());
+    }
     let merkez = ortalama(kirp(&s, w / 3, h / 3, w / 3, h / 3).pixels());
     for p in s.pixels_mut() {
         for c in 0..3 {
@@ -163,7 +172,7 @@ pub fn leke(kaynak: &Path, ad: &str, cikti: &Path, opaklik: f32) {
         }
         Rgba([renk[0], renk[1], renk[2], a])
     });
-    kaydet_saydam(&ortu, &cikti.join("leke-ortu.png"));
+    kaydet_saydam(&ortu, &cikti.join("leke-ortu.png"))?;
     let mut sirali: Vec<(f32, [f32; 3])> = sk
         .pixels()
         .map(|p| (parlaklik(p), [p[0], p[1], p[2]]))
@@ -177,6 +186,11 @@ pub fn leke(kaynak: &Path, ad: &str, cikti: &Path, opaklik: f32) {
         sk.width(),
         sk.height()
     );
-    assert!(sapma < 1.5, "örtü çarpmayı karşılamıyor");
-    assert!(k >= 4.5, "leke metni okunmaz yapıyor");
+    if sapma >= 1.5 {
+        return Err(format!("örtü çarpmayı karşılamıyor: {sapma:.2}/255").into());
+    }
+    if k < 4.5 {
+        return Err(format!("leke metni okunmaz yapıyor: kontrast {k:.2}").into());
+    }
+    Ok(())
 }

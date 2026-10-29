@@ -24,15 +24,16 @@ const LEKE_OPAKLIK: f32 = 0.85;
 /// Kenarlık ve boncuk dokusu: 2x ekranda 32 mantıksal px.
 const UI_KALINLIK: u32 = 64;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let kaynak = std::env::args()
         .nth(1)
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("C:/Users/buzbe/Desktop/tema"));
     let cikti = Path::new(env!("CARGO_MANIFEST_DIR")).join("../assets");
-    zemin::kagit(&kaynak, KAGIT, &cikti);
-    zemin::leke(&kaynak, LEKE, &cikti, LEKE_OPAKLIK);
-    kilim::kilim(&kaynak, SERIT_B, CERCEVE_A, CERCEVE_B, &cikti, UI_KALINLIK);
-    boncuk::boncuklar(&kaynak, BONCUK, &cikti, UI_KALINLIK);
-    println!("assets: {}", cikti.canonicalize().unwrap().display());
+    zemin::kagit(&kaynak, KAGIT, &cikti)?;
+    zemin::leke(&kaynak, LEKE, &cikti, LEKE_OPAKLIK)?;
+    kilim::kilim(&kaynak, SERIT_B, CERCEVE_A, CERCEVE_B, &cikti, UI_KALINLIK)?;
+    boncuk::boncuklar(&kaynak, BONCUK, &cikti, UI_KALINLIK)?;
+    println!("assets: {}", cikti.display());
+    Ok(())
 }

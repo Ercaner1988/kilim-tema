@@ -36,9 +36,17 @@ impl Dokular {
 }
 
 fn yukle(ctx: &Context, ad: &str, bayt: &[u8], dosemeli: bool) -> TextureHandle {
-    let img = image::load_from_memory(bayt)
-        .expect("gömülü tema varlığı çözülemedi")
-        .to_rgba8();
+    let img = match image::load_from_memory(bayt) {
+        Ok(img) => img.to_rgba8(),
+        Err(hata) => {
+            eprintln!("kilim-tema: gömülü doku '{ad}' çözülemedi: {hata}");
+            return ctx.load_texture(
+                ad,
+                ColorImage::filled([2, 2], egui::Color32::MAGENTA),
+                TextureOptions::NEAREST,
+            );
+        }
+    };
     let boyut = [img.width() as usize, img.height() as usize];
     let opt = TextureOptions {
         magnification: TextureFilter::Linear,
@@ -59,7 +67,7 @@ fn yukle(ctx: &Context, ad: &str, bayt: &[u8], dosemeli: bool) -> TextureHandle 
 
 macro_rules! varlik {
     ($yol:expr) => {
-        include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/", $yol))
+        include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/../assets/", $yol))
     };
 }
 
@@ -104,7 +112,7 @@ macro_rules! kenarlik {
 
 /// İlk çağrıda dokuları GPU'ya yükler, sonra Context'teki kopyayı döndürür.
 pub fn dokular(ctx: &Context) -> Arc<Dokular> {
-    let id = Id::new("kilim-tema/dokular");
+    let id = Id::unique("kilim-tema/dokular");
     if let Some(d) = ctx.data(|m| m.get_temp::<Arc<Dokular>>(id)) {
         return d;
     }

@@ -1,6 +1,6 @@
 //! İsteğe bağlı semantik işlev betiği. Komut çalıştırmaz; gerçek Response'u döndürür.
-use crate::{Boncuk, Rol};
 use egui::{Color32, Context, Id, Rect, Response, Shape, Stroke, Ui};
+use kilim_cekirdek::{Boncuk, Rol};
 use serde::Deserialize;
 
 #[derive(Clone, Copy, Debug)]
@@ -76,7 +76,8 @@ fn renk(s: &str) -> Result<Color32, String> {
     if !matches!(h.len(), 6 | 8) || !h.bytes().all(|c| c.is_ascii_hexdigit()) {
         return Err(format!("Geçersiz renk: {s}"));
     }
-    let n = |i| u8::from_str_radix(&h[i..i + 2], 16).unwrap();
+    // `dogrula` aynı hex biçimini önceden sınar; varsayılan yalnız bozuk iç duruma karşı emniyet ağıdır.
+    let n = |i| u8::from_str_radix(&h[i..i + 2], 16).unwrap_or_default();
     Ok(Color32::from_rgba_unmultiplied(
         n(0),
         n(2),
@@ -151,32 +152,32 @@ impl TemaBetigi {
     /// Yalnız doğrulanmış betik Context'e atomik olarak yazılır; global stil değişmez.
     pub fn kur(&self, ctx: &Context) -> Result<(), String> {
         self.dogrula()?;
-        ctx.data_mut(|d| d.insert_temp(Id::new(BETIK), std::sync::Arc::new(self.clone())));
+        ctx.data_mut(|d| d.insert_temp(Id::unique(BETIK), std::sync::Arc::new(self.clone())));
         ctx.request_repaint();
         Ok(())
     }
 }
 
-fn uygula(v: &mut egui::style::WidgetVisuals, r: &Renkler, k: &crate::Kilim) {
+fn uygula(v: &mut egui::style::WidgetVisuals, r: &Renkler, k: &kilim_cekirdek::Kilim) {
     if let Some(c) = &r.dolgu {
-        v.bg_fill = renk(c).unwrap();
+        v.bg_fill = renk(c).unwrap_or(Color32::TRANSPARENT);
         v.weak_bg_fill = v.bg_fill;
         if r.metin.is_none() {
-            v.fg_stroke.color = crate::okunur_metin(v.bg_fill, k);
+            v.fg_stroke.color = kilim_cekirdek::okunur_metin(v.bg_fill, k);
         }
     }
     if let Some(c) = &r.metin {
-        v.fg_stroke.color = renk(c).unwrap();
+        v.fg_stroke.color = renk(c).unwrap_or(Color32::TRANSPARENT);
     }
     if let Some(c) = &r.cizgi {
-        v.bg_stroke = Stroke::new(1.0, renk(c).unwrap());
+        v.bg_stroke = Stroke::new(1.0, renk(c).unwrap_or(Color32::TRANSPARENT));
     }
 }
 
 /// Closure kendi egui kimliğini korur; semantik id birden çok satırı seçebilir.
 pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Response) -> Response {
     let initialized = ui.ctx().data_mut(|d| {
-        let id = Id::new("kilim/islev-hook");
+        let id = Id::unique("kilim/islev-hook");
         let exists = d.get_temp::<bool>(id).unwrap_or(false);
         d.insert_temp(id, true);
         exists
@@ -185,13 +186,14 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
         ui.ctx().on_begin_pass(
             "kilim/islev-defteri",
             std::sync::Arc::new(|ui| {
-                ui.ctx().data_mut(|d| d.remove::<Defter>(Id::new(DEFTER)));
+                ui.ctx()
+                    .data_mut(|d| d.remove::<Defter>(Id::unique(DEFTER)));
             }),
         );
     }
     let betik = ui
         .ctx()
-        .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::new(BETIK)));
+        .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::unique(BETIK)));
     let kurallar: Vec<_> = betik
         .as_ref()
         .map(|b| {
@@ -224,9 +226,9 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
     let arka = (doku.is_some() || yuzey).then(|| painter.add(Shape::Noop));
     let enabled = ui.is_enabled();
     let k = if ui.visuals().dark_mode {
-        crate::koyu()
+        kilim_cekirdek::koyu()
     } else {
-        crate::acik()
+        kilim_cekirdek::acik()
     };
     let rol_stili = tanim.rol.stili(ui);
     let (cevap, gorseller) = ui
@@ -264,13 +266,14 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
                     uygula(&mut v.widgets.active, &kural.pressed, &k);
                     uygula(&mut v.widgets.noninteractive, &kural.disabled, &k);
                     if let Some(c) = &kural.selected.dolgu {
-                        v.selection.bg_fill = renk(c).unwrap();
+                        v.selection.bg_fill = renk(c).unwrap_or(Color32::TRANSPARENT);
                     }
                     if let Some(c) = &kural.selected.metin {
-                        v.selection.stroke.color = renk(c).unwrap();
+                        v.selection.stroke.color = renk(c).unwrap_or(Color32::TRANSPARENT);
                     }
                     if let Some(c) = &kural.selected.cizgi {
-                        v.selection.stroke = Stroke::new(1.0, renk(c).unwrap());
+                        v.selection.stroke =
+                            Stroke::new(1.0, renk(c).unwrap_or(Color32::TRANSPARENT));
                     }
                 }
             }
@@ -313,7 +316,7 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
             gorseller.inactive
         };
         if let Some(d) = doku {
-            let ds = crate::dokular(ui.ctx());
+            let ds = kilim_cekirdek::dokular(ui.ctx());
             let (texture, uv) = if d == "kagit" {
                 let karo = ds.kagit.size_vec2() * 0.5;
                 (
@@ -324,7 +327,10 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
                     ),
                 )
             } else {
-                (ds.boncuk(boncuk(d).unwrap()).id(), crate::UV_TAM)
+                (
+                    ds.boncuk(boncuk(d).unwrap_or(Boncuk::Nazar)).id(),
+                    kilim_cekirdek::UV_TAM,
+                )
             };
             painter.set(
                 index,
@@ -344,7 +350,7 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
                 painter.rect_stroke(
                     cevap.rect,
                     0.0,
-                    Stroke::new(2.0, renk(c).unwrap()),
+                    Stroke::new(2.0, renk(c).unwrap_or(Color32::TRANSPARENT)),
                     egui::StrokeKind::Inside,
                 );
             }
@@ -364,7 +370,7 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
     };
     let kare = ui.ctx().cumulative_frame_nr();
     ui.ctx().data_mut(|d| {
-        let f = d.get_temp_mut_or_default::<Defter>(Id::new(DEFTER));
+        let f = d.get_temp_mut_or_default::<Defter>(Id::unique(DEFTER));
         if f.kare != kare {
             f.kare = kare;
             f.kayitlar.clear();
@@ -384,7 +390,7 @@ pub fn islev(ui: &mut Ui, tanim: IslevTanimi, ciz: impl FnOnce(&mut Ui) -> Respo
 
 /// Son çizim geçişinin kayıtları; sonraki boş geçişte defter temizlenir.
 pub fn islev_kayitlari(ctx: &Context) -> Vec<IslevKaydi> {
-    ctx.data(|d| d.get_temp::<Defter>(Id::new(DEFTER)))
+    ctx.data(|d| d.get_temp::<Defter>(Id::unique(DEFTER)))
         .map(|d| d.kayitlar)
         .unwrap_or_default()
 }
@@ -421,10 +427,10 @@ mod tests {
         }
         assert!(TemaBetigi::coz(&" ".repeat(262145)).is_err());
         assert!(ctx
-            .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::new(BETIK)))
+            .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::unique(BETIK)))
             .is_some());
         assert!(Context::default()
-            .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::new(BETIK)))
+            .data(|d| d.get_temp::<std::sync::Arc<TemaBetigi>>(Id::unique(BETIK)))
             .is_none());
     }
     #[test]
@@ -481,7 +487,7 @@ mod tests {
             id = Some(r.id);
         });
         out.textures_delta.clear();
-        let texture = crate::dokular(&ctx).kagit.id();
+        let texture = kilim_cekirdek::dokular(&ctx).kagit.id();
         assert!(out.shapes.iter().any(|s|matches!(&s.shape,Shape::Rect(r) if r.brush.as_ref().is_some_and(|b|b.fill_texture_id==texture))));
         let kayit = islev_kayitlari(&ctx).pop().unwrap();
         assert_eq!(Some(kayit.response_id), id);

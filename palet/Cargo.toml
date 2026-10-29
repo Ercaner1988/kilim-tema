@@ -6,4 +6,4 @@ license = "MIT"
 description = "Kilim paleti, tema paketi ve kenarlık varyantı: kilim-tema'nın renk çekirdeği (ADR 0001, sandık sınırı için ayrıldı)"
 
 [dependencies]
-egui = "0.36"
+egui = "0.37"

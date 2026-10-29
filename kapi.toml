@@ -1,0 +1,24 @@
+# Kilim'in ortak egui tema kütüphanesi için Altın Kapı kapsam beyanı.
+repo = "kilim-tema"
+
+[boyut]
+arkayuz = "uygulanmaz"               # Bağımsız arka uç/servis çalıştırmaz.
+onyuz = "uygulanir"                   # egui tema ve etkileşim bileşenleri sağlar.
+veritabani = "uygulanmaz"             # Veritabanı kullanmaz.
+makine_zararsizligi = "uygulanir"     # Tema paketi ve tercihlerini kullanıcı dizinine yazar.
+tedarik_guvenligi = "uygulanir"
+bellek_guvenligi = "uygulanir"        # Rust kütüphanesi ve görsel işleme bağımlılıkları.
+kimlik_yolu = "uygulanmaz"            # Kimlik doğrulama veya hesap verisi yok.
+yayina_hazirlik = "uygulanmaz"        # Ürün ikilisi değil, diğer Rust-egui uygulamalarına kütüphane.
+kaynak_tuketimi = "uygulanir"         # Çizim ve doku oluşturma.
+birlikte_calisabilirlik = "uygulanir" # Ortak tema paketi ve kararlı genel API.
+karakter_yazimi = "uygulanir"
+hata_disiplini = "uygulanir"
+test_gercekciligi = "uygulanir"
+veri_dayanikliligi = "uygulanir"      # Tema tercihi ve paket dosyalarını kalıcılaştırır.
+surum_izi = "uygulanir"
+belge_dogrulugu = "uygulanir"
+
+# CI dosyası olmadığından kapının çalıştıracağı ek cargo komutları.
+[temel]
+ek_cargo = [["fmt","--all","--check"],["clippy","--workspace","--all-targets","--locked","--","-D","warnings"],["test","--workspace","--locked"]]

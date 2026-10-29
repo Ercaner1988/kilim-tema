@@ -7,6 +7,13 @@ use std::path::Path;
 use crate::kural::{isaretli, oneriler, rol_kararlari, rol_oner, Dosya, Oneri};
 use crate::tara::{Bulgu, Tur};
 
+// `String` fmt::Write işlemleri hata veremez; yine de sonucu açıkça tüketerek must-use uyarısını önle.
+macro_rules! y {
+    ($metin:expr, $($arg:tt)*) => {{
+        $metin.write_fmt(format_args!($($arg)*)).unwrap_or(())
+    }};
+}
+
 pub struct Arac {
     pub ad: String,
     pub dosyalar: Vec<Dosya>,
@@ -201,7 +208,7 @@ fn kurulum_ozeti(a: &Arac) -> String {
                     .map(move |b| format!("{}:{}", d.yol, b.satir))
             })
             .collect();
-        let _ = write!(
+        y!(
             s,
             "{ad}: {} | ",
             if yer.is_empty() {
@@ -222,7 +229,7 @@ pub fn plan_metni(a: &Arac) -> String {
         .filter(|d| d.satirlar.iter().any(|l| l.contains("run_native(")))
         .map(|d| d.yol.as_str())
         .collect::<Vec<_>>();
-    let _ = writeln!(
+    y!(
         s,
         "Giriş (run_native): {}",
         if giris.is_empty() {
@@ -231,7 +238,7 @@ pub fn plan_metni(a: &Arac) -> String {
             giris.join(", ")
         }
     );
-    let _ = writeln!(s, "Kurulum: {}", kurulum_ozeti(a));
+    y!(s, "Kurulum: {}", kurulum_ozeti(a));
     let (mut toplam, mut isaretli_say) = (0, 0);
     let mut turler: BTreeMap<&'static str, usize> = BTreeMap::new();
     for d in &a.dosyalar {
@@ -243,12 +250,12 @@ pub fn plan_metni(a: &Arac) -> String {
             }
         }
     }
-    let _ = writeln!(
+    y!(
         s,
         "Rol taşıyabilen bölge: {toplam} (işaretli {isaretli_say}, işaretsiz {})",
         toplam - isaretli_say
     );
-    let _ = writeln!(
+    y!(
         s,
         "Bulunan öğeler: {}",
         turler
@@ -257,7 +264,7 @@ pub fn plan_metni(a: &Arac) -> String {
             .collect::<Vec<_>>()
             .join(", ")
     );
-    let _ = writeln!(s, "\nBölge ağacı (dosya sırasıyla):");
+    y!(s, "\nBölge ağacı (dosya sırasıyla):");
     for d in &a.dosyalar {
         for (k, b) in d.bulgular.iter().enumerate() {
             if let Some(r) = bolge_satiri(a, d, k, b) {
@@ -270,7 +277,7 @@ pub fn plan_metni(a: &Arac) -> String {
     for o in &ons {
         *kodlar.entry(o.kod).or_insert(0) += 1;
     }
-    let _ = writeln!(
+    y!(
         s,
         "\nÖneri sayıları: {}",
         if kodlar.is_empty() {
@@ -310,7 +317,7 @@ fn bolge_satiri(a: &Arac, d: &Dosya, k: usize, b: &Bulgu) -> Option<String> {
     );
     let kararlar = rol_kararlari(rol);
     if !kararlar.is_empty() {
-        let _ = writeln!(s, "{girinti}    karar: {kararlar}");
+        y!(s, "{girinti}    karar: {kararlar}");
     }
     Some(s)
 }
@@ -330,21 +337,27 @@ pub fn talep_metni(a: &Arac) -> String {
         } else {
             " + Cargo.toml: kilim-tema bağımlılığı YOK (kitaplık temadan bağımsız tasarlandıysa talep konak uygulamaya aittir)"
         };
-        let _ = writeln!(
+        y!(
             s,
             "\n-- {} (kullanım: use kilim_tema::{{Rol, RolVer}};{bag})",
             d.yol
         );
         for o in ons {
             n += 1;
-            let _ = writeln!(
+            y!(
                 s,
                 "{}:{}  [{}] {}\n    gerekçe: {}\n    önce : {}\n    sonra: {}",
-                o.yol, o.satir, o.kod, o.baslik, o.gerekce, o.once, o.sonra
+                o.yol,
+                o.satir,
+                o.kod,
+                o.baslik,
+                o.gerekce,
+                o.once,
+                o.sonra
             );
         }
     }
-    let _ = writeln!(s, "\nToplam talep: {n}");
+    y!(s, "\nToplam talep: {n}");
     s
 }
 
@@ -373,7 +386,7 @@ fn kurulum_talebi(a: &Arac, s: &mut String) -> usize {
         .into_iter()
         .filter(|k| !var(k))
         .collect();
-    let _ = writeln!(
+    y!(
         s,
         "\n-- araç düzeyi\n{}:{}  [KURULUM] giriş `run_native` var, `kilim_tema::giydir` yok\n    gerekçe: giydir = iki_temayi_kur + sarma_kur + tercih.uygula + (KILIM_ROL_IZ=1 ise) rol bindirmesi; şu an eksik olanlar: {}\n    önce : Box::new(|cc| {{ .. kendi tema/sarma çağrıları .. }})\n    sonra: Box::new(|cc| {{ let tercih = kilim_tema::TemaTercihi::yukle(\"<uygulama>\", kilim_tema::TemaTercihi::varsayilan(kilim_tema::Varyant::CamGobegiAltin)); kilim_tema::giydir(&cc.egui_ctx, &tercih); .. }})",
         d.yol,

@@ -198,10 +198,9 @@ impl TemaPaketi {
         );
         for (onek, k) in [("acik", &self.acik), ("koyu", &self.koyu)] {
             for a in ALANLAR {
-                s.push_str(&format!(
-                    "{onek}.{a}={}\n",
-                    hex_yaz(alan_oku(k, a).expect("bilinen alan"))
-                ));
+                if let Some(renk) = alan_oku(k, a) {
+                    s.push_str(&format!("{onek}.{a}={}\n", hex_yaz(renk)));
+                }
             }
         }
         s
@@ -212,17 +211,22 @@ static ETKIN: RwLock<Option<TemaPaketi>> = RwLock::new(None);
 
 /// Etkin paketi kurar (`None`: yerleşik tema). `acik()`, `koyu()` ve `Varyant::vurgu` bunu izler.
 pub fn paketi_kur(p: Option<TemaPaketi>) {
-    *ETKIN.write().unwrap() = p;
+    *ETKIN
+        .write()
+        .unwrap_or_else(std::sync::PoisonError::into_inner) = p;
 }
 
 pub fn etkin_paket() -> Option<TemaPaketi> {
-    ETKIN.read().unwrap().clone()
+    ETKIN
+        .read()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .clone()
 }
 
 pub(crate) fn etkin_palet(koyu: bool) -> Option<Kilim> {
     ETKIN
         .read()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .as_ref()
         .map(|p| if koyu { p.koyu } else { p.acik })
 }
@@ -230,7 +234,7 @@ pub(crate) fn etkin_palet(koyu: bool) -> Option<Kilim> {
 pub(crate) fn etkin_vurgu(koyu: bool) -> Option<Color32> {
     ETKIN
         .read()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .as_ref()
         .map(|p| if koyu { p.vurgu_koyu } else { p.vurgu_acik })
 }
@@ -261,17 +265,44 @@ pub fn etkin_paketi_yukle(uygulama: &str) -> bool {
     true
 }
 
-/// Kaydedemezse sessizce geçer: tema yalnız kolaylıktır.
+/// Kaydı başarısız olursa hatayı stderr'e yazar; eski imza uyumluluk için korunur.
 pub fn etkin_paketi_kaydet(uygulama: &str, p: &TemaPaketi) {
-    if let Some(d) = uygulama_dosyasi(uygulama, "tema") {
-        let _ = d.parent().map(std::fs::create_dir_all);
-        let _ = std::fs::write(d, p.kod());
+    if let Err(hata) = etkin_paketi_kaydet_sonuc(uygulama, p) {
+        eprintln!("kilim-tema: paket kaydedilemedi: {hata}");
     }
 }
 
+/// Etkin paketi yapılandırma dizinine yazar; başarısızlık çağırana döner.
+pub fn etkin_paketi_kaydet_sonuc(uygulama: &str, p: &TemaPaketi) -> std::io::Result<()> {
+    let d = uygulama_dosyasi(uygulama, "tema").ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "yapılandırma dizini bulunamadı",
+        )
+    })?;
+    if let Some(ust) = d.parent() {
+        std::fs::create_dir_all(ust)?;
+    }
+    std::fs::write(d, p.kod())
+}
+
 pub fn etkin_paketi_sil(uygulama: &str) {
-    if let Some(d) = uygulama_dosyasi(uygulama, "tema") {
-        let _ = std::fs::remove_file(d);
+    if let Err(hata) = etkin_paketi_sil_sonuc(uygulama) {
+        eprintln!("kilim-tema: paket silinemedi: {hata}");
+    }
+}
+
+/// Etkin paketi siler; dosya zaten yoksa işlem başarılı sayılır.
+pub fn etkin_paketi_sil_sonuc(uygulama: &str) -> std::io::Result<()> {
+    let d = uygulama_dosyasi(uygulama, "tema").ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "yapılandırma dizini bulunamadı",
+        )
+    })?;
+    match std::fs::remove_file(d) {
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        result => result,
     }
 }
 

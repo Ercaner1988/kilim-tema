@@ -1,6 +1,7 @@
 //! Görüntü yardımcıları. Bütün değerler 0..1 aralığında f32.
 
 use std::path::Path;
+use std::{error::Error, io};
 
 use image::imageops::{self, FilterType};
 use image::{DynamicImage, ImageBuffer, Rgb, Rgb32FImage, Rgba, Rgba32FImage};
@@ -16,11 +17,13 @@ pub const MUREKKEP: [f32; 3] = [
     0x21 as f32 / 255.0,
 ];
 
-pub fn yukle(kok: &Path, ad: &str) -> Rgb32FImage {
+pub type Sonuc<T> = Result<T, Box<dyn Error>>;
+
+pub fn yukle(kok: &Path, ad: &str) -> Sonuc<Rgb32FImage> {
     let yol = kok.join(format!("Gemini_Generated_Image_{ad}.jpg"));
-    image::open(&yol)
-        .unwrap_or_else(|e| panic!("{} açılamadı: {e}", yol.display()))
-        .to_rgb32f()
+    Ok(image::open(&yol)
+        .map_err(|e| io::Error::other(format!("{} açılamadı: {e}", yol.display())))?
+        .to_rgb32f())
 }
 
 pub fn parlaklik(p: &Rgb<f32>) -> f32 {
@@ -77,28 +80,32 @@ pub fn kirp_01(mut g: Rgb32FImage) -> Rgb32FImage {
     g
 }
 
-pub fn kaydet(g: &Rgb32FImage, yol: &Path) {
-    std::fs::create_dir_all(yol.parent().unwrap()).unwrap();
+pub fn kaydet(g: &Rgb32FImage, yol: &Path) -> Sonuc<()> {
+    if let Some(parent) = yol.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
     DynamicImage::ImageRgb32F(kirp_01(g.clone()))
         .to_rgb8()
-        .save(yol)
-        .unwrap();
+        .save(yol)?;
+    Ok(())
 }
 
-pub fn kaydet_saydam(g: &Rgba32FImage, yol: &Path) {
-    std::fs::create_dir_all(yol.parent().unwrap()).unwrap();
-    DynamicImage::ImageRgba32F(g.clone())
-        .to_rgba8()
-        .save(yol)
-        .unwrap();
+pub fn kaydet_saydam(g: &Rgba32FImage, yol: &Path) -> Sonuc<()> {
+    if let Some(parent) = yol.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    DynamicImage::ImageRgba32F(g.clone()).to_rgba8().save(yol)?;
+    Ok(())
 }
 
-pub fn kaydet_jpeg(g: &Rgb32FImage, yol: &Path, kalite: u8) {
-    let dosya = std::fs::File::create(yol).unwrap();
+pub fn kaydet_jpeg(g: &Rgb32FImage, yol: &Path, kalite: u8) -> Sonuc<()> {
+    if let Some(parent) = yol.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let dosya = std::fs::File::create(yol)?;
     let rgb = DynamicImage::ImageRgb32F(kirp_01(g.clone())).to_rgb8();
-    image::codecs::jpeg::JpegEncoder::new_with_quality(dosya, kalite)
-        .encode_image(&rgb)
-        .unwrap();
+    image::codecs::jpeg::JpegEncoder::new_with_quality(dosya, kalite).encode_image(&rgb)?;
+    Ok(())
 }
 
 pub fn kirp(g: &Rgb32FImage, x: u32, y: u32, w: u32, h: u32) -> Rgb32FImage {
@@ -127,4 +134,15 @@ pub fn hex(c: [f32; 3]) -> String {
 
 pub fn bos_saydam(w: u32, h: u32) -> Rgba32FImage {
     ImageBuffer::from_pixel(w, h, Rgba([0.0; 4]))
+}
+
+#[cfg(test)]
+mod sinama {
+    use super::*;
+
+    #[test]
+    fn eksik_girdi_panik_yerine_hata_dondurur() {
+        let kok = std::env::temp_dir().join(format!("kilim-isle-eksik-{}", std::process::id()));
+        assert!(yukle(&kok, "olmayan-kaynak").is_err());
+    }
 }

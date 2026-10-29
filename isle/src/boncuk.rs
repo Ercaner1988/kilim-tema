@@ -15,9 +15,12 @@ fn medyan(mut v: Vec<f32>) -> f32 {
     v[v.len() / 2]
 }
 
-pub fn boncuklar(kaynak: &Path, ad: &str, cikti: &Path, boyut: u32) {
-    let b = yukle(kaynak, ad);
+pub fn boncuklar(kaynak: &Path, ad: &str, cikti: &Path, boyut: u32) -> Sonuc<()> {
+    let b = yukle(kaynak, ad)?;
     let (w, h) = b.dimensions();
+    if w < 20 || h < 60 || boyut == 0 {
+        return Err("boncuk görseli en az 20x60, hedef boyut pozitif olmalı".into());
+    }
     let kose: Vec<_> = [(0, 0), (w - 20, 0), (0, h - 20), (w - 20, h - 20)]
         .iter()
         .flat_map(|&(x0, y0)| (0..20).flat_map(move |y| (0..20).map(move |x| (x0 + x, y0 + y))))
@@ -39,14 +42,24 @@ pub fn boncuklar(kaynak: &Path, ad: &str, cikti: &Path, boyut: u32) {
             .flat_map(|y| (0..n).map(move |x| (x, y)))
             .filter(|&(x, y)| alfa(ox + x, oy + y) > 0.5)
             .collect();
-        let (x0, x1) = (
-            ici.iter().map(|p| p.0).min().unwrap(),
-            ici.iter().map(|p| p.0).max().unwrap() + 1,
-        );
-        let (y0, y1) = (
-            ici.iter().map(|p| p.1).min().unwrap(),
-            ici.iter().map(|p| p.1).max().unwrap() + 1,
-        );
+        let Some(x0) = ici.iter().map(|p| p.0).min() else {
+            return Err(format!("{ad} boncuğu algılanamadı").into());
+        };
+        let x1 = ici
+            .iter()
+            .map(|p| p.0)
+            .max()
+            .ok_or_else(|| format!("{ad} boncuğu algılanamadı"))?
+            + 1;
+        let Some(y0) = ici.iter().map(|p| p.1).min() else {
+            return Err(format!("{ad} boncuğu algılanamadı").into());
+        };
+        let y1 = ici
+            .iter()
+            .map(|p| p.1)
+            .max()
+            .ok_or_else(|| format!("{ad} boncuğu algılanamadı"))?
+            + 1;
         let kenar = (x1 - x0).max(y1 - y0) + 4;
         let (px, py) = ((kenar - (x1 - x0)) / 2, (kenar - (y1 - y0)) / 2);
         let mut tuval = bos_saydam(kenar, kenar);
@@ -73,12 +86,15 @@ pub fn boncuklar(kaynak: &Path, ad: &str, cikti: &Path, boyut: u32) {
         kaydet_saydam(
             &kucult_saydam(&tuval, boyut, boyut),
             &cikti.join("boncuk").join(format!("{ad}.png")),
-        );
+        )?;
     }
     println!(
         "boncuk: {} adet, arka plan {}, kalan magenta saçak pikseli {sacak}",
         BONCUKLAR.len(),
         hex(m)
     );
-    assert!(sacak < 50, "magenta saçağı kalmış");
+    if sacak >= 50 {
+        return Err(format!("magenta saçağı kalmış: {sacak} piksel").into());
+    }
+    Ok(())
 }

@@ -2,7 +2,7 @@
 //! Gösterme/gizleme ve yerel pencere komutlarını çağıran uygulama yönetir.
 
 use crate::Boncuk;
-use egui::{pos2, vec2, CursorIcon, Response, Sense, Stroke, Ui, WidgetInfo, WidgetType};
+use egui::{pos2, vec2, CursorIcon, Response, Role, Sense, Stroke, Ui, WidgetInfo};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PencereDugmesi {
@@ -37,7 +37,7 @@ pub fn pencere_dugmesi(ui: &mut Ui, tur: PencereDugmesi, cap: f32) -> Response {
         Sense::click()
     };
     let r = crate::boncuk_dugme_duyulu(ui, boncuk, "", cap, duyu);
-    r.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), tur.etiket()));
+    r.widget_info(|| WidgetInfo::labeled(Role::Button, ui.is_enabled(), tur.etiket()));
     if ui.is_rect_visible(r.rect) {
         let c = r.rect.center()
             + vec2(

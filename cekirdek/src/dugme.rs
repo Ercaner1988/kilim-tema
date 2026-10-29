@@ -2,8 +2,8 @@
 //! egui'nin düz yeşil/mavi işaretleri yerine boncuk yuvası: seçili = boncuk, değil = boş yuva.
 
 use egui::{
-    pos2, vec2, Button, Color32, CornerRadius, Image, Painter, Rect, Response, Sense, Stroke,
-    TextStyle, TextWrapMode, Ui, WidgetInfo, WidgetText, WidgetType,
+    pos2, vec2, Button, Color32, CornerRadius, Image, Painter, Rect, Response, Role, Sense, Stroke,
+    TextStyle, TextWrapMode, Ui, WidgetInfo, WidgetText,
 };
 
 use crate::{dokular, Boncuk, UV_TAM};
@@ -67,9 +67,9 @@ fn isaretli(ui: &mut Ui, secili: bool, metin: impl Into<WidgetText>, kare: bool)
     let boy = vec2(cap + bosluk + galley.size().x, cap.max(galley.size().y));
     let (rect, cevap) = ui.allocate_exact_size(boy, Sense::click());
     let tur = if kare {
-        WidgetType::Checkbox
+        Role::CheckBox
     } else {
-        WidgetType::RadioButton
+        Role::RadioButton
     };
     cevap.widget_info(|| WidgetInfo::selected(tur, ui.is_enabled(), secili, galley.text()));
     if ui.is_rect_visible(rect) {

@@ -296,7 +296,7 @@ impl Rol {
         let k = if koyu { crate::koyu() } else { crate::acik() };
         let kilim = etkin_gorunum(ctx) == Gorunum::Kilim;
         let mut s = self.stili_hesapla(&k, koyu, crate::etkin_varyant(ctx), kilim);
-        if let Some(ezme) = ctx.data(|d| d.get_temp::<Ezmeler>(Id::new(EZME))) {
+        if let Some(ezme) = ctx.data(|d| d.get_temp::<Ezmeler>(Id::unique(EZME))) {
             for (rol, f) in ezme.0.iter() {
                 if *rol == self {
                     f(&mut s);
@@ -355,7 +355,7 @@ const GORUNUM: &str = "kilim-tema-gorunum";
 /// Aynı rol için sonradan eklenen önceki ezmelerin üstüne biner.
 pub fn rol_ezme(ctx: &Context, rol: Rol, f: impl Fn(&mut RolStili) + Send + Sync + 'static) {
     ctx.data_mut(|d| {
-        let id = Id::new(EZME);
+        let id = Id::unique(EZME);
         let mut e: Vec<(Rol, EzmeFn)> = d
             .get_temp::<Ezmeler>(id)
             .map_or_else(Vec::new, |e| e.0.to_vec());
@@ -367,12 +367,12 @@ pub fn rol_ezme(ctx: &Context, rol: Rol, f: impl Fn(&mut RolStili) + Send + Sync
 /// `TemaTercihi::uygula`nın son kurduğu görünüm. Hiç kurulmadıysa [`Gorunum::Sade`] (palet düz yüzey;
 /// kâğıt yalnız `cerceve` ile çizildiğinde vardır).
 pub fn etkin_gorunum(ctx: &Context) -> Gorunum {
-    ctx.data(|d| d.get_temp(Id::new(GORUNUM)))
+    ctx.data(|d| d.get_temp(Id::unique(GORUNUM)))
         .unwrap_or(Gorunum::Sade)
 }
 
 pub(crate) fn gorunumu_kaydet(ctx: &Context, g: Gorunum) {
-    ctx.data_mut(|d| d.insert_temp(Id::new(GORUNUM), g));
+    ctx.data_mut(|d| d.insert_temp(Id::unique(GORUNUM), g));
 }
 
 /// Yazı rolünün (Vurgu/Hata/Uyari/Basari) rengi, `ui`'nin GERÇEK arka planına göre okunur ayarlanmış:

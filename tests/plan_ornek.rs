@@ -62,7 +62,8 @@ fn pasli(ui: &mut Ui) {
         .rol(Rol::UstCubuk)
         .show(ui, |ui| {
             ui.horizontal_wrapped(|ui| {
-                let _ = ui.button("☰ araçlar");
+                // egui_kittest 0.37 eksik glifi (☰ varsayılan yazı tiplerinde yok) panikle reddeder: düz metin.
+                let _ = ui.button("Menü araçlar");
             });
         });
     egui::Panel::top("gorunum")

@@ -1,0 +1,11 @@
+[package]
+name = "kilim-cekirdek"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Kilim egui temasının ortak çizim, rol ve tercih çekirdeği"
+
+[dependencies]
+egui = "0.37"
+kilim-palet = { path = "../palet" }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
