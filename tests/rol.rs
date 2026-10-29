@@ -223,8 +223,7 @@ fn isaretleme_bosta_yeniden_cizim_istemez() {
 
 // ---------------------------------------------------------------- 3. rolden otomatik yerleşim kararları
 
-// egui_kittest 0.37 eksik glifi panikle reddeder (⚠ varsayılan yazı tiplerinde yok): gerçek iletideki simge "!" ile yazıldı.
-const UZUN: &str = "! .github:2 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. Ayrıntı: https://github.blog/changelog/2025-09-19";
+const UZUN: &str = "⚠ .github:2 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. Ayrıntı: https://github.blog/changelog/2025-09-19";
 
 /// Sağ panelin iç genişliği her karede ölçülür.
 fn panel_genislikleri(rol: Option<Rol>) -> Vec<f32> {

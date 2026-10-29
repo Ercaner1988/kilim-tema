@@ -9,7 +9,7 @@ description = "Ortak egui teması: Kilim paleti, Semerkant kâğıdı zemini, Y�
 members = [".", "isle", "tarama", "palet", "cekirdek", "betik"]
 
 [dependencies]
-egui = "0.37"
+egui = { version = "0.37", features = ["monochrome_emoji_fonts"] }
 kilim-cekirdek = { path = "cekirdek" }
 kilim-betik = { path = "betik" }
 

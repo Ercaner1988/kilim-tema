@@ -7,8 +7,7 @@ use std::rc::Rc;
 use egui::Ui;
 use egui_kittest::Harness;
 
-// egui_kittest 0.37 eksik glifi panikle reddeder (⚠ varsayılan yazı tiplerinde yok): gerçek iletideki simge "!" ile yazıldı.
-const UZUN: &str = "! .github:2 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. Ayrıntı: https://github.blog/changelog/2025-09-19";
+const UZUN: &str = "⚠ .github:2 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. Ayrıntı: https://github.blog/changelog/2025-09-19";
 const ORTA: &str = "Ercaner1988/ibn-unNedim · git@github.com:Ercaner1988/ibn-unNedim.git";
 const KARE: usize = 12;
 /// Sınama penceresinde sağ panelin varsayılan genişliği.

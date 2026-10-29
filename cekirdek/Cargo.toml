@@ -6,6 +6,6 @@ license = "MIT"
 description = "Kilim egui temasının ortak çizim, rol ve tercih çekirdeği"
 
 [dependencies]
-egui = "0.37"
+egui = { version = "0.37", features = ["monochrome_emoji_fonts"] }
 kilim-palet = { path = "../palet" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
