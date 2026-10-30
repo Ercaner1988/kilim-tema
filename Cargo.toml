@@ -15,7 +15,7 @@ kilim-betik = { path = "betik" }
 
 [dev-dependencies]
 egui_kittest = { version = "0.37", features = ["wgpu"] }
-eframe = { version = "0.37", features = ["wgpu"] }
+eframe = { version = "0.37", default-features = false, features = ["accesskit", "default_fonts", "wgpu"] }
 
 # Keep the wgpu v30 surface-id leak fix aligned with the application workspace.
 [patch.crates-io]
